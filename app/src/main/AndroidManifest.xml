@@ -8,13 +8,25 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".core.app.NotesApplication"
+        android:largeHeap="true"
+        android:windowSoftInputMode="adjustPan|stateAlwaysVisible"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="false"
+        android:enableOnBackInvokedCallback="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NotesTrack"
-        tools:targetApi="31">
+        android:theme="@style/Theme.App.Splash"
+        tools:targetApi="tiramisu">
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".core.presentation.MainActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="locked"
+            android:resizeableActivity="true"
+            tools:ignore="DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

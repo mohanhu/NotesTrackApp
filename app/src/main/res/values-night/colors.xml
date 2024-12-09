@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="background">#C0EBF8</color> <!-- Example light background -->
-    <color name="text">#000000</color> <!-- Example light text color -->
-
-    <color name="primary">#C0EBF8</color>
-    <color name="primary_container">#E7F5FA</color>
-    <color name="primary_dark">#2CC2EC</color>
+    <color name="background">#000000</color> <!-- Example light background -->
+    <color name="text">#FFFFFF</color> <!-- Example light text color -->
 
     <color name="white">#FFFFFF</color>
     <color name="ivory">#FFFFF0</color>

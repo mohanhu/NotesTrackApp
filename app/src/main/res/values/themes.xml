@@ -1,9 +1,36 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.NotesTrack" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Study" parent="Base.Theme.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="Q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="Q">false</item>
     </style>
 
-    <style name="Theme.NotesTrack" parent="Base.Theme.NotesTrack" />
+    <style name="Theme.Study" parent="Base.Theme.Study">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorSecondary">@color/black</item>
+        <item name="colorOnBackground">@color/primary</item>
+        <item name="colorSurface">@color/black</item>
+        <item name="errorTextColor">@color/red</item>
+        <item name="colorAccent">@color/primary</item>
+
+        <item name="isLightTheme">true</item>
+        <item name="android:isLightTheme" tools:targetApi="Q">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    </style>
+
+    <style name="Theme.App.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenBackground">@color/primary_dark</item>
+        <item name="postSplashScreenTheme">@style/Theme.Study</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:isLightTheme" tools:targetApi="Q">true</item>
+    </style>
 </resources>
