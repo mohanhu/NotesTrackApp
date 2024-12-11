@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_home_selector"
+        android:title="@string/home"
+        android:tooltipText="@string/home" />
+
+    <item
+        android:id="@+id/addMenuFragment"
+        android:enabled="true"
+        android:icon="@drawable/plus_add_menu"
+        android:title="@string/add"
+        android:tooltipText="@string/add" />
+
+    <item
+        android:id="@+id/profileFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="@string/profile"
+        android:tooltipText="@string/profile" />
+
+</menu>

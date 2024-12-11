@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -11,11 +13,11 @@
         android:name=".core.app.NotesApplication"
         android:largeHeap="true"
         android:windowSoftInputMode="adjustPan|stateAlwaysVisible"
-        android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="false"
         android:enableOnBackInvokedCallback="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="false"
         android:theme="@style/Theme.App.Splash"
         tools:targetApi="tiramisu">
         <activity

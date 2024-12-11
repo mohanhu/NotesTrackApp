@@ -382,4 +382,16 @@
         <!-- END - Material 3 -->
     </style>
 
+    <style name="Widget.App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">0dp</item>
+        <item name="itemTextAppearanceActive">@font/roboto_regular</item>
+        <item name="itemTextAppearanceInactive">@font/roboto_regular</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <item name="colorSecondaryContainer">@color/transparent</item>
+    </style>
+
 </resources>

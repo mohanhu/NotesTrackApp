@@ -40,6 +40,15 @@ android {
     }
     buildFeatures{
         viewBinding = true
+        buildConfig = true
+    }
+
+    flavorDimensions.add("default")
+    productFlavors{
+        create("dev"){
+            dimension = "default"
+            buildConfigField("String","PHOTO_BASE_URL","\"https://api.pexels.com/v1/\"")
+        }
     }
 }
 
