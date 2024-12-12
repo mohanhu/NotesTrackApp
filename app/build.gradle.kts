@@ -132,6 +132,8 @@ dependencies {
 
     implementation(platform(libs.firebase.bom.v3340))
 
+    implementation (libs.skydoves.colorPicker)
+
 //    implementation(libs.firebase.crashlytics)
 //    implementation(libs.analytics)
 

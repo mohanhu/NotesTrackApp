@@ -23,7 +23,7 @@ class AddCategoryRepositoryImpl @Inject constructor(
 ): AddCategoryRepository {
 
     override suspend fun getSearchCardImage(query: String, page: Int): Result<HomePhotoResponse> {
-        return when (val result = addCategoryDataSource.getSearchCardImage(query = query, page = page, perPage = 10)) {
+        return when (val result = addCategoryDataSource.getSearchCardImage(query = query, page = page, perPage = 20)) {
             is NetworkResult.Error -> Result.Error(BadApiRequestException(""))
             is NetworkResult.Loading -> Result.Loading()
             is NetworkResult.Success -> Result.Success(data = result.data ?: HomePhotoResponse())
@@ -33,7 +33,7 @@ class AddCategoryRepositoryImpl @Inject constructor(
     override fun getSearchCard(): Flow<PagingData<PhotoDto>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 10,
+                pageSize = 20,
                 prefetchDistance = 5
             ),
             pagingSourceFactory = {

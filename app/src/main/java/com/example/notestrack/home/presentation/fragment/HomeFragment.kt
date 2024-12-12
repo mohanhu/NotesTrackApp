@@ -9,7 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.notestrack.R
 import com.example.notestrack.databinding.FragmentHomeBinding
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import com.example.notestrack.home.presentation.adapter.NotesHomeAdapter
@@ -57,7 +59,11 @@ class HomeFragment : Fragment() {
 
     private fun FragmentHomeBinding.bindList(listFlow: Flow<List<NotesHomeMenuData>>) {
         rvNotesTitle.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
-        val adapter = NotesHomeAdapter()
+        val adapter = NotesHomeAdapter(
+            pick = {
+                findNavController().navigate(R.id.addNotesFragment)
+            }
+        )
         rvNotesTitle.adapter = adapter
 
         listFlow.distinctUntilChanged().onEach { data->

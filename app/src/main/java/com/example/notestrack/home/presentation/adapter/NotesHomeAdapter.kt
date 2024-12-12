@@ -12,7 +12,9 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.notestrack.databinding.HomeNotesListViewBinding
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 
-class NotesHomeAdapter :
+class NotesHomeAdapter(
+    private val pick:(NotesHomeMenuData)->Unit
+) :
     ListAdapter<NotesHomeMenuData, NotesHomeAdapter.ViewHolderOne>(DifferNotes) {
 
     inner class ViewHolderOne(private val binding: HomeNotesListViewBinding) :
@@ -24,6 +26,9 @@ class NotesHomeAdapter :
                 Glide.with(itemView.context).load(data.thumbNail)
                     .apply(RequestOptions.centerCropTransform())
                     .diskCacheStrategy(DiskCacheStrategy.ALL).into(ivThumbNail)
+            }
+            itemView.setOnClickListener {
+                pick.invoke(data)
             }
         }
     }

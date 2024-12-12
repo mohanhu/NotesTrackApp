@@ -35,6 +35,8 @@ class AddCategoryViewModel @Inject constructor(
 
     val accept: (AddCategoryUiAction)->Unit
 
+    val imageListPaging = addCategoryRepository.getSearchCard().cachedIn(viewModelScope)
+
     init {
         _uiTypingTitle.asSharedFlow().filterIsInstance<AddCategoryUiAction.TypingTitle>().distinctUntilChanged().onEach { type->
             _uiState.update { it.copy(categoryTitle = type.title ) }
@@ -52,21 +54,25 @@ class AddCategoryViewModel @Inject constructor(
                 is AddCategoryUiAction.TypingTitle -> {
                     _uiTypingTitle.emit(addCategoryUiAction)
                 }
+
+                is AddCategoryUiAction.ChooseColorCardStroke -> {
+                    _uiState.update { it.copy(color = addCategoryUiAction.color) }
+                }
             }
         }
     }
-
-    val imageListPaging = addCategoryRepository.getSearchCard().cachedIn(viewModelScope)
-
 }
 
 sealed interface AddCategoryUiAction{
     data class ChooseIcon(val image:String): AddCategoryUiAction
 
     data class TypingTitle(val title:String): AddCategoryUiAction
+
+    data class ChooseColorCardStroke(val color:String): AddCategoryUiAction
 }
 
 data class AddCategoryUiState(
     val categoryImage:String = "",
     val categoryTitle:String = "",
+    val color:String = "",
 )

@@ -14,4 +14,9 @@
     <string name="category_card_view">Category card view 🫡</string>
     <string name="confirm">Confirm</string>
     <string name="choose_your_card_image">Choose your card image 🤝</string>
+    <string name="card_background_color">Card background color 🤩</string>
+    <string name="add_notes">Add Notes</string>
+    <string name="enter_title">Enter title</string>
+    <string name="description">Description 📝</string>
+    <string name="type_something">Type something…</string>
 </resources>
