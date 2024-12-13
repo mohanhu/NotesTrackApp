@@ -3,7 +3,7 @@ androidx-junit = "1.1.5"
 appcompat = "1.6.1"
 skydoves-colorPicker = "2.3.0"
 constraintlayout = "2.1.4"
-core = "4.6.2"
+core-v = "4.6.2"
 core-ktx = "1.12.0"
 coreSplashscreen = "1.1.0-alpha02"
 datastorePreferences = "1.0.0-beta01"
@@ -69,7 +69,6 @@ androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-j
 androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 skydoves-colorPicker = { module = "com.github.skydoves:colorpickerview", version.ref = "skydoves-colorPicker" }
-core-mark = { module = "io.noties.markwon:core", version.ref = "core" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-bom-v3340 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
@@ -123,11 +122,16 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 zoomimage-compose = { module = "com.jsibbold:zoomage", version.ref = "zoomimageCompose" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
+core-mark = { group = "io.noties.markwon", name="core", version.ref = "core-v" }
+core-mark-strike = { group = "io.noties.markwon", name="ext-strikethrough", version.ref = "core-v" }
+core-mark-link = { group = "io.noties.markwon", name="ext-linkify", version.ref = "core-v" }
+
 [bundles]
 sdp = ["android-sdp","android-ssp"]
 navigation = ["androidx-navigation-fragment-ktx","androidx-navigation-navigation-ui-ktx"]
 navigation-hilt = ["androidx-hilt-navigation","androidx-hilt-navigation-fragment"]
 media3 = ["android-media3-media-dash","android-media3-media-ui","android-media3-media3-session","android-media3-mediaplayer"]
+markdown = ["core-mark-strike","core-mark"]
 
 [plugins]
 android-application ={id="com.android.application" , version.ref = "android-application" }

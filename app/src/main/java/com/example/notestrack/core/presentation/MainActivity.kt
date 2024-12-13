@@ -56,7 +56,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.bindState()
 
+        val sum = { a:Int, b :Int-> a+b}
+
+//        val ans = addNew(3,4){ a,b->
+//
+//        }
+//        println("Main sum launch > $ans")
     }
+//
+//    private fun addNew(a:Int,b:Int,(Int,Int)->Int):Int{
+//        return 3
+//    }
 
     private fun ActivityMainBinding.bindState() {
         navController.graph = navGraph

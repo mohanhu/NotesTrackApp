@@ -134,6 +134,7 @@ dependencies {
 
     implementation (libs.skydoves.colorPicker)
 
+    implementation (libs.bundles.markdown)
 //    implementation(libs.firebase.crashlytics)
 //    implementation(libs.analytics)
 
