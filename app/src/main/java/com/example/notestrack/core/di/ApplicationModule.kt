@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.notestrack.BuildConfig
+import com.example.notestrack.core.data.repository.SessionData
+import com.example.notestrack.core.data.repository.SessionPrefImpl
+import com.example.notestrack.core.domain.repository.SessionPref
 import com.example.notestrack.core.local.NotesDataBase
 import com.example.notestrack.core.service.ApiService
 import com.example.notestrack.utils.network.NetworkCollector
@@ -52,6 +55,11 @@ object ApplicationModule {
     ):NotesDataBase = Room.databaseBuilder(context,
         NotesDataBase::class.java,
         "NotesDataBase").fallbackToDestructiveMigration().build()
+
+
+    @Singleton
+    @Provides
+    fun provideSession(@ApplicationContext context: Context): SessionPref = SessionPrefImpl(context.getSharedPreferences(SessionData.Session,Context.MODE_PRIVATE))
 }
 
 

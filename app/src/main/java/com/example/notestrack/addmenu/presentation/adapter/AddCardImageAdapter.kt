@@ -9,14 +9,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.notestrack.R
 import com.example.notestrack.addmenu.data.model.PhotoDto
+import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.databinding.ImageChoosenLayOutBinding
 
 class AddCardImageAdapter(
     private val onImageClick:(String)->Unit
-):PagingDataAdapter<PhotoDto,AddCardImageAdapter.ViewHolder>(DifferCard) {
+):PagingDataAdapter<Photo,AddCardImageAdapter.ViewHolder>(DifferCard) {
 
     inner class ViewHolder(val binding: ImageChoosenLayOutBinding):RecyclerView.ViewHolder(binding.root){
-        fun bindItem(data:PhotoDto){
+        fun bindItem(data:Photo){
             println("AddCardImageAdapter >>> ${data.src}")
             Glide.with(itemView.context).load(data.src.original).apply(RequestOptions.centerCropTransform())
                 .placeholder(R.drawable.ev_search_back_ground) // optional
@@ -38,12 +39,12 @@ class AddCardImageAdapter(
     }
 }
 
-object DifferCard : DiffUtil.ItemCallback<PhotoDto>() {
-    override fun areItemsTheSame(oldItem: PhotoDto, newItem: PhotoDto): Boolean {
+object DifferCard : DiffUtil.ItemCallback<Photo>() {
+    override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: PhotoDto, newItem: PhotoDto): Boolean {
+    override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
         return oldItem == newItem
     }
 

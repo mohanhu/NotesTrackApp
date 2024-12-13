@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.example.notestrack.addmenu.data.model.PhotoDto
+import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.addmenu.presentation.adapter.AddCardImageAdapter
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiAction
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiState
@@ -59,7 +59,7 @@ class AddMenuFragment : Fragment() {
     }
 
     private fun FragmentAddMenuBinding.bindState(
-        imageListPaging: Flow<PagingData<PhotoDto>>,
+        imageListPaging: Flow<PagingData<Photo>>,
         accept: (AddCategoryUiAction) -> Unit,
         uiState: StateFlow<AddCategoryUiState>
     ) {
@@ -93,7 +93,7 @@ class AddMenuFragment : Fragment() {
     }
 
     private fun FragmentAddMenuBinding.bindList(
-        imageListPaging: Flow<PagingData<PhotoDto>>,
+        imageListPaging: Flow<PagingData<Photo>>,
         accept: (AddCategoryUiAction) -> Unit
     ) {
         val adapter = AddCardImageAdapter(

@@ -18,6 +18,7 @@ import com.example.notestrack.home.presentation.adapter.NotesHomeAdapter
 import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
 import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiState
 import com.example.notestrack.home.presentation.viewmodel.HomeNotesViewModel
+import com.example.notestrack.profile.data.local.entity.UserDetailEntity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +56,17 @@ class HomeFragment : Fragment() {
 
         bindList(uiState.map { it.homeCategoryList })
 
+        bindUiDetails(uiState.map { it.userDetailEntity })
+
+    }
+
+    private fun FragmentHomeBinding.bindUiDetails(user: Flow<UserDetailEntity>) {
+
+        user.onEach {
+            tvUserName.text = getString(R.string.hey_s,it.userName)
+            ivUserImage.text = it.userImage
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun FragmentHomeBinding.bindList(listFlow: Flow<List<NotesHomeMenuData>>) {

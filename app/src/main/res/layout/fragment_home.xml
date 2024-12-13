@@ -50,16 +50,20 @@
                     android:layout_width="@dimen/_30sdp"
                     android:layout_height="@dimen/_30sdp"
                     android:layout_marginEnd="@dimen/inset_medium"
+                    app:strokeColor="@color/primary_dark"
                     app:cardBackgroundColor="?attr/colorOnBackground"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/tv_user_name">
 
-                    <androidx.appcompat.widget.AppCompatImageView
+                    <TextView
                         android:id="@+id/iv_user_image"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_launcher_foreground" />
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.TitleMedium"
+                        tools:text="😁"/>
 
                 </com.google.android.material.card.MaterialCardView>
 

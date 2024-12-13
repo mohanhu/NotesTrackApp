@@ -21,6 +21,7 @@ import com.example.notestrack.addnote.presentation.viewmodel.NotesUiAction
 import com.example.notestrack.addnote.presentation.viewmodel.NotesUiState
 import com.example.notestrack.databinding.FragmentAddNotesBinding
 import com.example.notestrack.richlib.RichTypeEnum
+import com.example.notestrack.richlib.spanrichlib.BlockKit.blockKitListGenerate
 import com.example.notestrack.richlib.spanrichlib.BulletOrdering.addBulletList
 import com.example.notestrack.richlib.spanrichlib.BulletOrdering.bulletFormatForward
 import com.example.notestrack.richlib.spanrichlib.NumberOrdering.addNumberList
@@ -32,11 +33,13 @@ import com.example.notestrack.richlib.spanrichlib.RichSpanDownStyle.toggleStyle
 import com.example.notestrack.richlib.spanrichlib.Styles
 import com.example.notestrack.utils.ViewExtentions.showKeyBoard
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddNotesFragment : Fragment() {
@@ -116,10 +119,18 @@ class AddNotesFragment : Fragment() {
                 }
                 evDesc.toFormatNumberBasedOnCursor(cursorPos)
                 LAST_SPAN_RICH_EDITOR_CURSOR_POSITION = evDesc.selectionStart
-//                listenerMentionTag(s.toString())
-//                listenerBlockOfData()
+                listenerBlockOfData()
             }
         })
+    }
+
+
+    private fun FragmentAddNotesBinding.listenerBlockOfData() = lifecycleScope.launch {
+        observeStyleType(CURRENT_RICH_STYLE_FORMAT)
+        if (evDesc.text.toString().trim().isEmpty()) delay(200)
+        val blockJsonFile = evDesc.blockKitListGenerate()
+        println("listenerBlockOfData >>> ... >>>$blockJsonFile")
+        viewModel.generateJsonBlockApplied(jsonBlockRich = blockJsonFile)
     }
 
     private fun FragmentAddNotesBinding.toggleWithUpdateStyle(richTypeEnum: RichTypeEnum, styles: Styles){

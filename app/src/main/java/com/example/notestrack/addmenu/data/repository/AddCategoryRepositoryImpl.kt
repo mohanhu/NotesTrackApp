@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSourceFactory
 import com.example.notestrack.addmenu.data.model.HomePhotoResponse
 import com.example.notestrack.addmenu.data.model.PhotoDto
+import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.addmenu.domain.repository.AddCategoryDataSource
 import com.example.notestrack.addmenu.domain.repository.AddCategoryRepository
 import com.example.notestrack.addmenu.domain.repository.CategoryPagingSource
@@ -30,7 +31,7 @@ class AddCategoryRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getSearchCard(): Flow<PagingData<PhotoDto>> {
+    override fun getSearchCard(): Flow<PagingData<Photo>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,

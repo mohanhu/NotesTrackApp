@@ -19,4 +19,8 @@
     <string name="enter_title">Enter title</string>
     <string name="description">Description 📝</string>
     <string name="type_something">Type something…</string>
+    <string name="edit">Edit</string>
+    <string name="light_theme">Light Theme</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="saved_notes">Saved Notes</string>
 </resources>
