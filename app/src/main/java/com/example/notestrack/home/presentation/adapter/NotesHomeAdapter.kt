@@ -21,9 +21,9 @@ class NotesHomeAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bindItem(data: NotesHomeMenuData) {
             binding.apply {
-                cvCardColor.setStrokeColor(Color.parseColor(data.pickedColor))
+                cvCardColor.setStrokeColor(Color.parseColor(data.pickedColor.ifEmpty { "#800080" }))
                 tvTitleOfNotes.text = data.menuTitle
-                Glide.with(itemView.context).load(data.thumbNail)
+                Glide.with(itemView.context).load(data.thumbNail.ifEmpty { "https://projectsly.com/images/blog/task-management-strategies.png?v=1686553999071005322" })
                     .apply(RequestOptions.centerCropTransform())
                     .diskCacheStrategy(DiskCacheStrategy.ALL).into(ivThumbNail)
             }

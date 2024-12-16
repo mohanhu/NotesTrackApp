@@ -3,6 +3,7 @@ package com.example.notestrack.addnote.data.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.notestrack.notedetails.data.model.NotesData
 
 @Entity(tableName = NotesTable.TABLE_NAME)
 data class NotesTableEntity(
@@ -13,7 +14,13 @@ data class NotesTableEntity(
     @ColumnInfo(name = NotesTable.Column.Notes_DATE) val date: String = "",
     @ColumnInfo(name = NotesTable.Column.Category_ID) val categoryId: Long = 0,
 )
-
+{
+    fun toNotesData():NotesData{
+        return NotesData(
+            notesId, notesName, notesDesc, notesBlock, date, categoryId
+        )
+    }
+}
 
 object NotesTable {
     const val TABLE_NAME = "NotesTable"

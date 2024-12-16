@@ -3,6 +3,8 @@ package com.example.notestrack.addnote.presentation.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notestrack.addnote.data.local.entity.NotesTableEntity
+import com.example.notestrack.addnote.domain.repository.NotesRepository
 import com.example.notestrack.richlib.Rich
 import com.example.notestrack.richlib.RichEditDataClass
 import com.example.notestrack.richlib.RichTypeEnum
@@ -12,8 +14,11 @@ import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,7 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddNotesViewModel @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
+    private val notesRepository: NotesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -29,6 +35,8 @@ class AddNotesViewModel @Inject constructor(
         NotesUiState()
     )
 
+    private val _uiEvent= MutableSharedFlow<NotesUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     val accept: (NotesUiAction)->Unit
 
@@ -41,7 +49,51 @@ class AddNotesViewModel @Inject constructor(
             is NotesUiAction.SelectRichStyle -> {
                 updateListWhichStyleSelect(notesUiAction.richEditDataClass,notesUiAction.selectNow)
             }
+
+            is NotesUiAction.TypeStateOfDescription -> {
+                _uiState.update { it.copy(description = notesUiAction.description) }
+                checkValid()
+            }
+            is NotesUiAction.TypeStateOfTitle -> {
+                _uiState.update { it.copy(title = notesUiAction.title) }
+                checkValid()
+            }
+
+            NotesUiAction.SubmitNotes -> submitNote()
+            is NotesUiAction.UpdateCurrentNoteMenuId -> {
+                _uiState.update { it.copy(currentNoteMenuId = notesUiAction.menuId) }
+            }
         }
+    }
+
+    private fun submitNote() =viewModelScope.launch(Dispatchers.IO){
+        notesRepository.addNotes(
+            NotesTableEntity(
+                notesName = _uiState.value.title,
+                notesDesc = _uiState.value.description,
+                notesBlock = _uiState.value.inputTextUpload,
+                categoryId = _uiState.value.currentNoteMenuId
+            )
+        )
+        sendUiEvent(NotesUiEvent.ShowSnackBar("Notes Added"))
+        delay(1000)
+        sendUiEvent(NotesUiEvent.NavigateToBack)
+    }
+
+    private fun checkValid() = viewModelScope.launch(Dispatchers.IO){
+        val description = _uiState.value.description
+        val title = _uiState.value.title
+
+        _uiState.update {
+            it.copy(
+                isButtonEnabled = (description.trimIndent().isNotEmpty() && title.trimIndent().isNotEmpty())
+            )
+        }
+
+    }
+
+    private fun sendUiEvent(notesUiEvent: NotesUiEvent) = viewModelScope.launch(Dispatchers.IO){
+        _uiEvent.emit(notesUiEvent)
     }
 
     private fun updateListWhichStyleSelect(richEditDataClass: RichTypeEnum,selectNow:Boolean) = viewModelScope.launch(Dispatchers.IO){
@@ -77,9 +129,22 @@ class AddNotesViewModel @Inject constructor(
 
 sealed interface NotesUiAction{
     data class SelectRichStyle(val richEditDataClass: RichTypeEnum,val selectNow:Boolean): NotesUiAction
+    data class TypeStateOfTitle(val title:String): NotesUiAction
+    data class TypeStateOfDescription(val description:String): NotesUiAction
+    data object SubmitNotes: NotesUiAction
+    data class UpdateCurrentNoteMenuId(val menuId:Long): NotesUiAction
 }
 
 data class NotesUiState(
+    val currentNoteMenuId:Long=0,
     val richStyle: List<RichEditDataClass> = Rich.generateRichStyleData(),
-    val inputTextUpload: String=""
+    val inputTextUpload: String="",
+    val title:String="",
+    val description:String="",
+    val isButtonEnabled:Boolean = false
 )
+
+sealed interface NotesUiEvent{
+    data class ShowSnackBar(val message: String): NotesUiEvent
+    data object NavigateToBack: NotesUiEvent
+}

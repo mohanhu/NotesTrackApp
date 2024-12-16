@@ -24,4 +24,8 @@
         android:id="@+id/addMenuFragment"
         android:name="com.example.notestrack.addmenu.presentation.fragment.AddMenuFragment"
         android:label="AddMenuFragment" />
+    <fragment
+        android:id="@+id/allNotesDetailsFragment"
+        android:name="com.example.notestrack.notedetails.presentation.fragment.AllNotesDetailsFragment"
+        android:label="AllNotesDetailsFragment" />
 </navigation>

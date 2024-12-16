@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.example.notestrack.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,5 +24,20 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) { super.onViewCreated(view, savedInstanceState)
 
+        binding.bindState(
+        )
+    }
+
+    private fun FragmentProfileBinding.bindState() {
+
+        onClickListener()
+    }
+
+    private fun FragmentProfileBinding.onClickListener() {
+        cvEdit.setOnClickListener {
+            editProfile.isVisible = !editProfile.isVisible
+            ivEditUserImage.text = ivUserImage.text.toString()
+            evUser.setText(tvUserName.text.toString())
+        }
     }
 }

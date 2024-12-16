@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -20,14 +21,17 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.addmenu.presentation.adapter.AddCardImageAdapter
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiAction
+import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiEvent
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiState
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryViewModel
 import com.example.notestrack.databinding.FragmentAddMenuBinding
+import com.google.android.material.snackbar.Snackbar
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -51,17 +55,21 @@ class AddMenuFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) { super.onViewCreated(view, savedInstanceState)
 
-        binding.bindState(
-            viewModel.imageListPaging,
-            viewModel.accept,
-            viewModel.uiState
-        )
+        binding.run {
+            bindState(
+                viewModel.imageListPaging,
+                viewModel.accept,
+                viewModel.uiState,
+                viewModel.uiEvent
+            )
+        }
     }
 
     private fun FragmentAddMenuBinding.bindState(
         imageListPaging: Flow<PagingData<Photo>>,
         accept: (AddCategoryUiAction) -> Unit,
-        uiState: StateFlow<AddCategoryUiState>
+        uiState: StateFlow<AddCategoryUiState>,
+        uiEvent: SharedFlow<AddCategoryUiEvent>
     ) {
 
         bindList(imageListPaging,accept)
@@ -69,6 +77,22 @@ class AddMenuFragment : Fragment() {
         onClickListener(accept)
 
         observerCardList(uiState)
+
+        eventListener(uiEvent)
+    }
+
+    private fun eventListener(uiEvent: SharedFlow<AddCategoryUiEvent>) {
+        uiEvent.onEach {
+            when(it){
+                AddCategoryUiEvent.BackStack -> findNavController().popBackStack()
+                is AddCategoryUiEvent.ShowSnackBar -> {
+                    Snackbar.make(binding.root,it.message,Snackbar.LENGTH_SHORT)
+                        .setTextColor(Color.BLACK)
+                        .setBackgroundTint(Color.WHITE).show()
+                }
+            }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun FragmentAddMenuBinding.observerCardList(uiState: StateFlow<AddCategoryUiState>) {
@@ -88,6 +112,11 @@ class AddMenuFragment : Fragment() {
                 overviewCard.cvCardColor.strokeColor = Color.parseColor(it)
                 cardPickColor.setCardBackgroundColor(Color.parseColor(it))
             }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        uiState.map { it.buttonEnable }.distinctUntilChanged().onEach {
+            btnConfirmOuter.isVisible = it
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -136,6 +165,10 @@ class AddMenuFragment : Fragment() {
                 .setNegativeButton("Cancel"){d,_-> d.dismiss()}
                 .show()
 
+        }
+
+        btnConfirmOuter.setOnClickListener {
+            accept.invoke(AddCategoryUiAction.SubmitMenuCategory)
         }
     }
 }

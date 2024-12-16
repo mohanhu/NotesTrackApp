@@ -91,6 +91,71 @@
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <LinearLayout
+            android:id="@+id/edit_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/inset_large_medium"
+            android:gravity="center"
+
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cv_edit_user_image"
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
+                app:cardBackgroundColor="@color/primary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/blue">
+
+                <TextView
+                    android:id="@+id/iv_edit_user_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/inset_small"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.App.TitleLarge"
+                    tools:text="🤩" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ev_user_lay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/inset_small"
+                android:hint="@string/enter_username"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/primary"
+                app:counterEnabled="false"
+                app:counterMaxLength="80"
+                app:counterTextColor="@color/primary"
+                app:helperTextTextColor="@color/primary_dark"
+                app:hintTextColor="@color/primary_dark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_menu"
+                app:placeholderTextColor="@color/primary_dark">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/ev_user"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:textAppearance="@style/TextAppearance.App.BodySmall" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/dark_theme_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -99,7 +164,7 @@
             android:weightSum="4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/edit_profile">
 
             <ImageView
                 android:layout_width="@dimen/_20sdp"
@@ -201,5 +266,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/save_container" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_confirm_outer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="@dimen/inset_large_medium"
+        android:layout_marginBottom="@dimen/inset_medium"
+        android:background="@drawable/ev_search_back_ground"
+        android:gravity="center"
+        android:text="@string/edit"
+        android:textAllCaps="false"
+        android:textColor="?attr/colorSurface"
+        app:cardBackgroundColor="@color/transparent"
+        app:cardCornerRadius="@dimen/inset_large_medium"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/view29"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/input_container_max_width" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

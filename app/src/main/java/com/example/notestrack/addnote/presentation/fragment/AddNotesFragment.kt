@@ -1,6 +1,7 @@
 package com.example.notestrack.addnote.presentation.fragment
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,15 +10,18 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notestrack.addnote.presentation.adapter.RichStyleAdapter
 import com.example.notestrack.addnote.presentation.viewmodel.AddNotesViewModel
 import com.example.notestrack.addnote.presentation.viewmodel.NotesUiAction
+import com.example.notestrack.addnote.presentation.viewmodel.NotesUiEvent
 import com.example.notestrack.addnote.presentation.viewmodel.NotesUiState
 import com.example.notestrack.databinding.FragmentAddNotesBinding
 import com.example.notestrack.richlib.RichTypeEnum
@@ -32,8 +36,10 @@ import com.example.notestrack.richlib.spanrichlib.RichSpanDownStyle.onTypeStateC
 import com.example.notestrack.richlib.spanrichlib.RichSpanDownStyle.toggleStyle
 import com.example.notestrack.richlib.spanrichlib.Styles
 import com.example.notestrack.utils.ViewExtentions.showKeyBoard
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -61,17 +67,38 @@ class AddNotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.bindState(viewModel.uiState, viewModel.accept)
+        val menuId = savedInstanceState?.getLong("addNotesFragment",0L) ?:0L
+        viewModel.accept.invoke(NotesUiAction.UpdateCurrentNoteMenuId(menuId = menuId))
+
+        binding.bindState(viewModel.uiState, viewModel.accept,viewModel.uiEvent)
     }
 
     private fun FragmentAddNotesBinding.bindState(
         uiState: StateFlow<NotesUiState>,
-        accept: (NotesUiAction) -> Unit
+        accept: (NotesUiAction) -> Unit,
+        uiEvent: SharedFlow<NotesUiEvent>
     ) {
 
         bindList(uiState, accept)
 
         onClick(accept)
+
+        bindEvent(uiEvent)
+    }
+
+    private fun FragmentAddNotesBinding.bindEvent(uiEvent: SharedFlow<NotesUiEvent>) {
+        uiEvent.onEach {
+            when(it){
+                NotesUiEvent.NavigateToBack -> findNavController().popBackStack()
+                is NotesUiEvent.ShowSnackBar -> {
+                    Snackbar.make(root,it.message,Snackbar.LENGTH_SHORT)
+                        .setTextColor(Color.BLACK)
+                        .setBackgroundTint(Color.WHITE)
+                        .show()
+                }
+            }
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
     }
 
@@ -82,6 +109,10 @@ class AddNotesFragment : Fragment() {
 
         evDesc.setOnFocusChangeListener { _, b ->
             rvStyleMark.isVisible = b
+        }
+
+        btnConfirmOuter.setOnClickListener {
+            accept.invoke(NotesUiAction.SubmitNotes)
         }
 
         evDesc.setOnTouchListener { v, event ->
@@ -120,8 +151,12 @@ class AddNotesFragment : Fragment() {
                 evDesc.toFormatNumberBasedOnCursor(cursorPos)
                 LAST_SPAN_RICH_EDITOR_CURSOR_POSITION = evDesc.selectionStart
                 listenerBlockOfData()
+                accept.invoke(NotesUiAction.TypeStateOfDescription(s.toString()))
             }
         })
+        evTitle.doAfterTextChanged {
+            accept.invoke(NotesUiAction.TypeStateOfTitle(it.toString()))
+        }
     }
 
 
@@ -149,6 +184,12 @@ class AddNotesFragment : Fragment() {
         uiState: StateFlow<NotesUiState>,
         accept: (NotesUiAction) -> Unit
     ) {
+
+        uiState.map { it.isButtonEnabled }.distinctUntilChanged().onEach {
+            btnConfirmOuter.isVisible = it
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         val adapter = RichStyleAdapter(
             richRefreshStyle = {
                 when(it.richType){

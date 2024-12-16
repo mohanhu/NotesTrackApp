@@ -12,8 +12,8 @@ interface NotesDao {
     @Upsert
     suspend fun insertNotes(categoryTableEntity: NotesTableEntity)
 
-    @Query("SELECT * FROM ${NotesTable.TABLE_NAME}")
-    suspend fun getAllNotes(): List<NotesTableEntity>
+    @Query("SELECT * FROM ${NotesTable.TABLE_NAME} WHERE ${NotesTable.Column.Category_ID}=:menuId")
+    suspend fun getAllNotes(menuId:Long): List<NotesTableEntity>
 
     @Query("DELETE FROM ${NotesTable.TABLE_NAME}")
     suspend fun deleteAllNotes()

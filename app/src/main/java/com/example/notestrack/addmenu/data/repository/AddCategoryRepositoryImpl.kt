@@ -7,10 +7,12 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSourceFactory
 import com.example.notestrack.addmenu.data.model.HomePhotoResponse
 import com.example.notestrack.addmenu.data.model.PhotoDto
+import com.example.notestrack.addmenu.data.model.local.CategoryTableEntity
 import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.addmenu.domain.repository.AddCategoryDataSource
 import com.example.notestrack.addmenu.domain.repository.AddCategoryRepository
 import com.example.notestrack.addmenu.domain.repository.CategoryPagingSource
+import com.example.notestrack.core.local.NotesDataBase
 import com.example.notestrack.utils.network.BadApiRequestException
 import com.example.notestrack.utils.network.NetworkResult
 import com.example.notestrack.utils.network.Result
@@ -20,7 +22,8 @@ import javax.inject.Inject
 
 class AddCategoryRepositoryImpl @Inject constructor(
     @ApplicationContext context: Context,
-    private val addCategoryDataSource: AddCategoryDataSource
+    private val addCategoryDataSource: AddCategoryDataSource,
+    private val notesDataBase: NotesDataBase
 ): AddCategoryRepository {
 
     override suspend fun getSearchCardImage(query: String, page: Int): Result<HomePhotoResponse> {
@@ -43,5 +46,9 @@ class AddCategoryRepositoryImpl @Inject constructor(
                 )
             }
         ).flow
+    }
+
+    override suspend fun insertMenuCategory(categoryTableEntity: CategoryTableEntity) {
+        notesDataBase.categoryTableDao.insertCategory(categoryTableEntity)
     }
 }

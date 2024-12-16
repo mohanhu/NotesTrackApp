@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -73,7 +74,8 @@ class HomeFragment : Fragment() {
         rvNotesTitle.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         val adapter = NotesHomeAdapter(
             pick = {
-                findNavController().navigate(R.id.addNotesFragment)
+                val bundle = bundleOf("addNotesFragment" to it.menuNotesId)
+                findNavController().navigate(R.id.allNotesDetailsFragment,bundle)
             }
         )
         rvNotesTitle.adapter = adapter

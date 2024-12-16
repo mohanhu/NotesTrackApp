@@ -57,8 +57,13 @@ class HomeNotesViewModel
 
     private fun fetchUserDetails() = viewModelScope.launch(Dispatchers.IO) {
 
-        mainRepository.getUserRelationWithNotes(sessionPref.userId).onEach {
-            println("mainRepository.getUserRelationWithNotes >>>$it")
+        mainRepository.getUserRelationWithNotes(sessionPref.userId).onEach { relations ->
+            println("mainRepository.getUserRelationWithNotes >>>$relations")
+            if (relations.isNotEmpty()){
+                _uiState.update { state->
+                    state.copy(homeCategoryList = relations.first().categoryTableEntity.map { it.categoryTableEntity.toNotesHomeMenuData() })
+                }
+            }
         }.launchIn(viewModelScope)
 
         mainRepository.selectUserDetails().onEach { entities ->
@@ -81,12 +86,7 @@ class HomeNotesViewModel
 }
 
 data class HomeNoteUiState(
-    val homeCategoryList : List<NotesHomeMenuData> = listOf(
-        NotesHomeMenuData(),
-        NotesHomeMenuData(),
-        NotesHomeMenuData(),
-        NotesHomeMenuData()
-    ),
+    val homeCategoryList : List<NotesHomeMenuData> = listOf(),
     val userId: Long = 0,
     val userDetailEntity: UserDetailEntity=UserDetailEntity()
 )

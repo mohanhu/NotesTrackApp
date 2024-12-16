@@ -3,6 +3,7 @@ package com.example.notestrack.addmenu.data.model.local
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.notestrack.home.domain.model.NotesHomeMenuData
 
 @Entity(tableName = CategoryTable.TABLE_NAME)
 data class CategoryTableEntity(
@@ -13,7 +14,16 @@ data class CategoryTableEntity(
     @ColumnInfo(name = CategoryTable.Column.Category_COLOR) val color: String = "",
     @ColumnInfo(name = CategoryTable.Column.Category_NOTE_COUNT) val count: Int = 0,
     @ColumnInfo(name = CategoryTable.Column.USER_ID) val userId: Long = 0,
-)
+){
+    fun toNotesHomeMenuData(): NotesHomeMenuData = NotesHomeMenuData(
+        menuNotesId = categoryId,
+        menuTitle = categoryName,
+        thumbNail = categoryImage,
+        pickedColor = color,
+        count = count,
+        userId = userId
+    )
+}
 
 
 object CategoryTable {

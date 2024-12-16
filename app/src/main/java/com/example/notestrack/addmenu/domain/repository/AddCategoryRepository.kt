@@ -3,6 +3,7 @@ package com.example.notestrack.addmenu.domain.repository
 import androidx.paging.PagingData
 import com.example.notestrack.addmenu.data.model.HomePhotoResponse
 import com.example.notestrack.addmenu.data.model.PhotoDto
+import com.example.notestrack.addmenu.data.model.local.CategoryTableEntity
 import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.utils.network.Result
 import kotlinx.coroutines.flow.Flow
@@ -13,4 +14,5 @@ interface AddCategoryRepository {
 
    fun getSearchCard():Flow<PagingData<Photo>>
 
+   suspend fun insertMenuCategory(categoryTableEntity: CategoryTableEntity)
 }
