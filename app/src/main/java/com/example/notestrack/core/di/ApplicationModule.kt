@@ -1,11 +1,16 @@
 package com.example.notestrack.core.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.notestrack.BuildConfig
+import com.example.notestrack.core.data.repository.DataStorePreferenceImpl
 import com.example.notestrack.core.data.repository.SessionData
 import com.example.notestrack.core.data.repository.SessionPrefImpl
+import com.example.notestrack.core.domain.repository.DataStorePreference
 import com.example.notestrack.core.domain.repository.SessionPref
 import com.example.notestrack.core.local.NotesDataBase
 import com.example.notestrack.core.service.ApiService
@@ -26,6 +31,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApplicationModule {
+
+    private val Context.dataStore by preferencesDataStore("")
 
     @Provides
     @Singleton
@@ -60,6 +67,13 @@ object ApplicationModule {
     @Singleton
     @Provides
     fun provideSession(@ApplicationContext context: Context): SessionPref = SessionPrefImpl(context.getSharedPreferences(SessionData.Session,Context.MODE_PRIVATE))
+
+    @Provides
+    @Singleton
+    fun providersUserDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
+    }
+
 }
 
 
@@ -70,6 +84,11 @@ interface NetworkModule{
     @Binds
     @Singleton
     fun provideNetworkMonitor(networkCollector: NetworkCollector):NetworkMonitor
+
+    @Binds
+    @Singleton
+    fun provideDataStore(dataStorePreferenceImpl: DataStorePreferenceImpl):DataStorePreference
+
 }
 
 

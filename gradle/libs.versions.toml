@@ -57,6 +57,7 @@ playServicesAuth = "21.2.0"
 
 minSdk = "28"
 targetSdk = "34"
+emoji2Emojipicker = "1.5.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -125,6 +126,7 @@ play-services-auth = { group = "com.google.android.gms", name = "play-services-a
 core-mark = { group = "io.noties.markwon", name="core", version.ref = "core-v" }
 core-mark-strike = { group = "io.noties.markwon", name="ext-strikethrough", version.ref = "core-v" }
 core-mark-link = { group = "io.noties.markwon", name="ext-linkify", version.ref = "core-v" }
+androidx-emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emoji2Emojipicker" }
 
 [bundles]
 sdp = ["android-sdp","android-ssp"]

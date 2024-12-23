@@ -12,13 +12,12 @@
         android:id="@+id/addMenuFragment"
         android:enabled="true"
         android:icon="@drawable/plus_add_menu"
-        android:title="@string/add"
         android:tooltipText="@string/add" />
 
     <item
         android:id="@+id/profileFragment"
         android:enabled="true"
-        android:icon="@drawable/user_3296"
+        android:icon="@drawable/profile_male"
         android:title="@string/profile"
         android:tooltipText="@string/profile" />
 

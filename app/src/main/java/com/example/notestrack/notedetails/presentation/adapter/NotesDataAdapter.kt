@@ -7,12 +7,18 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notestrack.databinding.NotesTemplateBinding
 import com.example.notestrack.notedetails.data.model.NotesData
+import com.example.notestrack.utils.convertMsToDateFormat
 
 class NotesDataAdapter:ListAdapter<NotesData,NotesDataAdapter.ViewHolder>(DifferCardNotes) {
 
     inner class ViewHolder(val binding:NotesTemplateBinding):RecyclerView.ViewHolder(binding.root){
         fun bindItem(data: NotesData){
 
+            binding.apply {
+                tvTitleMenu.text = data.notesName
+                tvDesc.text = data.notesDesc
+                tvCreatedAt.text = convertMsToDateFormat(data.date)
+            }
         }
     }
 

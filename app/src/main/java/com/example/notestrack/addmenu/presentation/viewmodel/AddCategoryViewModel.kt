@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -81,8 +82,8 @@ class AddCategoryViewModel @Inject constructor(
                 categoryName = _uiState.value.categoryTitle,
                 categoryImage = _uiState.value.categoryImage,
                 color = _uiState.value.color.ifEmpty { "2CC2EC" },
-                count = 0,
-                userId = userId
+                userId = userId,
+                date = Instant.now().toEpochMilli()
             )
         )
         sendUiEvent(AddCategoryUiEvent.ShowSnackBar("Category Added Successfully 🎉"))

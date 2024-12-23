@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,10 +73,11 @@ class AddNotesViewModel @Inject constructor(
                 notesName = _uiState.value.title,
                 notesDesc = _uiState.value.description,
                 notesBlock = _uiState.value.inputTextUpload,
-                categoryId = _uiState.value.currentNoteMenuId
+                categoryId = _uiState.value.currentNoteMenuId,
+                date = Instant.now().toEpochMilli()
             )
         )
-        sendUiEvent(NotesUiEvent.ShowSnackBar("Notes Added"))
+        sendUiEvent(NotesUiEvent.ShowSnackBar("Notes Added Successfully 🎉"))
         delay(1000)
         sendUiEvent(NotesUiEvent.NavigateToBack)
     }

@@ -2,10 +2,14 @@ package com.example.notestrack.core.data.repository
 
 import android.content.SharedPreferences
 import com.example.notestrack.core.domain.repository.SessionPref
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class SessionPrefImpl(
     private val sharedPreferences: SharedPreferences
 ) : SessionPref {
+
+
     override val userId: Long
         get() = sharedPreferences.getLong(SessionData.SessionKey.USER_ID,0L)?:0L
 

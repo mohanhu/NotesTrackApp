@@ -3,6 +3,7 @@ package com.example.notestrack.notedetails.presentation.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import com.example.notestrack.notedetails.data.model.NotesData
 import com.example.notestrack.notedetails.domain.repository.AllNoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,6 +49,11 @@ class AllNoteViewModel @Inject constructor(
                 it.copy(notesData = ent)
             }
         }
+        allNoteRepository.fetchCategoryMenuId(menuId).also { ent->
+            _uiState.update {
+                it.copy(notesHomeMenuData = ent)
+            }
+        }
     }
 
 }
@@ -55,6 +61,7 @@ class AllNoteViewModel @Inject constructor(
 data class AllNoteUiState(
     val notesData: List<NotesData> = listOf(),
     val currentNoteMenuId:Long = 0,
+    val notesHomeMenuData: NotesHomeMenuData=NotesHomeMenuData()
 )
 
 sealed interface AllNoteUiAction{

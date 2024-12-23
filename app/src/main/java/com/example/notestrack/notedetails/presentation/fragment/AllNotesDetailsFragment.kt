@@ -12,18 +12,21 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notestrack.R
 import com.example.notestrack.databinding.FragmentAllNotesDetailsBinding
 import com.example.notestrack.notedetails.presentation.adapter.NotesDataAdapter
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteUiAction
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteUiState
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteViewModel
+import com.example.notestrack.utils.StringFormation.capitalise
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.util.Locale
 
 @AndroidEntryPoint
 class AllNotesDetailsFragment : Fragment() {
@@ -75,13 +78,18 @@ class AllNotesDetailsFragment : Fragment() {
     }
 
     private fun FragmentAllNotesDetailsBinding.bindList(uiState: StateFlow<AllNoteUiState>) {
-        rvImageChoosen.layoutManager = GridLayoutManager(requireContext(),2,GridLayoutManager.VERTICAL,false)
+        rvImageChoosen.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         val adapter = NotesDataAdapter(
 
         )
         rvImageChoosen.adapter = adapter
         uiState.map { it.notesData }.distinctUntilChanged().onEach {
             adapter.submitList(it)
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        uiState.map { it.notesHomeMenuData }.distinctUntilChanged().onEach {
+            tvUserName.text = it.menuTitle.capitalise()
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }

@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.play.services.auth)
+    implementation(libs.androidx.emoji2.emojipicker)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -137,5 +138,4 @@ dependencies {
     implementation (libs.bundles.markdown)
 //    implementation(libs.firebase.crashlytics)
 //    implementation(libs.analytics)
-
 }

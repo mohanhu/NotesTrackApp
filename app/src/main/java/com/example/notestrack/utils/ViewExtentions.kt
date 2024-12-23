@@ -1,12 +1,13 @@
 package com.example.notestrack.utils
 
 import android.content.Context
-import android.hardware.input.InputManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import com.example.notestrack.utils.ViewExtentions.hideKeyBoard
-import com.example.notestrack.utils.ViewExtentions.showKeyBoard
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object ViewExtentions {
 
@@ -35,7 +36,7 @@ object ViewExtentions {
     fun EditText.hideKeyBoard() {
         post {
             requestFocus()
-            context.inputManager.hideSoftInputFromWindow(windowToken,InputMethodManager.HIDE_IMPLICIT_ONLY)
+            context.inputManager.hideSoftInputFromWindow(windowToken,0)
         }
     }
 
@@ -48,4 +49,10 @@ fun safeCall(action:()->Unit){
     catch (e:Exception){
 
     }
+}
+
+fun convertMsToDateFormat(millis:Long):String{
+    val instant = Instant.ofEpochMilli(millis)
+    val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+    return dateTime.format(DateTimeFormatter.ofPattern("EEE dd-MMMM-yyyy"))
 }

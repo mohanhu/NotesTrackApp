@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.example.notestrack.core.local.relation.UserWithCategoryRelation
 import com.example.notestrack.profile.data.local.entity.UserDetailEntity
 import com.example.notestrack.profile.data.local.entity.UserTable
@@ -21,6 +22,7 @@ interface UserDetailDao {
     @Query("SELECT * FROM ${UserTable.TABLE_NAME}")
     fun getUserDetailsFlow(): Flow<List<UserDetailEntity>>
 
+    @Transaction
     @Query("SELECT * FROM ${UserTable.TABLE_NAME} WHERE ${UserTable.Column.USER_ID}=:userId")
     fun getUserRelationWithNotes(userId: Long): Flow<List<UserWithCategoryRelation>>
 

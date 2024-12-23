@@ -394,4 +394,9 @@
         <item name="colorSecondaryContainer">@color/transparent</item>
     </style>
 
+    <style name="EmojiPickerViewStyle">
+        <item name="colorControlNormal">#FFD9E0</item>
+        <item name="colorAccent">?attr/colorPrimary</item>
+    </style>
+
 </resources>

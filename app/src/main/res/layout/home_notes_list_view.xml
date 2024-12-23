@@ -35,8 +35,10 @@
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:maxLines="1"
-                android:padding="@dimen/inset_medium"
-                android:textAppearance="@style/TextAppearance.App.BodySmall"
+                android:paddingHorizontal="@dimen/inset_medium"
+                android:paddingVertical="@dimen/inset_small"
+                android:textAppearance="@style/TextAppearance.App.BodyMedium"
+                android:textStyle="bold"
                 tools:text="The Benefits of Health" />
 
             <TextView
@@ -47,7 +49,8 @@
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:maxLines="1"
-                android:padding="@dimen/inset_medium"
+                android:paddingHorizontal="@dimen/inset_medium"
+                android:paddingVertical="@dimen/inset_small"
                 android:textAppearance="@style/TextAppearance.App.BodySmall"
                 tools:text="02/02/2000" />
         </LinearLayout>
@@ -56,15 +59,16 @@
 
     <TextView
         android:id="@+id/tv_total_notes"
-        android:layout_width="@dimen/_50sdp"
-        android:layout_height="@dimen/_30sdp"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
         android:gravity="center"
-        android:maxLength="2"
-        android:textAppearance="@style/TextAppearance.App.BodyMedium"
+        android:maxLength="3"
+        android:layout_margin="@dimen/inset_small"
+        android:background="@drawable/circle_shape"
+        android:textAppearance="@style/TextAppearance.App.BodySmall"
         android:textColor="@color/text"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="30" />
+        android:hint="@string/_1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

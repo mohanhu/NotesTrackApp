@@ -5,6 +5,6 @@ data class NotesData(
     val notesName: String = "",
     val notesDesc: String = "",
     val notesBlock: String = "",
-    val date: String = "",
+    val date: Long = 0,
     val categoryId: Long = 0,
 )

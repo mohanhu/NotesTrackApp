@@ -25,6 +25,7 @@ import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiEvent
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiState
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryViewModel
 import com.example.notestrack.databinding.FragmentAddMenuBinding
+import com.example.notestrack.utils.convertMsToDateFormat
 import com.google.android.material.snackbar.Snackbar
 import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerDialog
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.time.Instant
 
 @AndroidEntryPoint
 class AddMenuFragment : Fragment() {
@@ -119,6 +121,8 @@ class AddMenuFragment : Fragment() {
             btnConfirmOuter.isVisible = it
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        overviewCard.tvCreatedAt.text = convertMsToDateFormat(Instant.now().toEpochMilli())
     }
 
     private fun FragmentAddMenuBinding.bindList(

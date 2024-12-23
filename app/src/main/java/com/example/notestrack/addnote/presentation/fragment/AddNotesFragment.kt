@@ -67,7 +67,7 @@ class AddNotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val menuId = savedInstanceState?.getLong("addNotesFragment",0L) ?:0L
+        val menuId = arguments?.getLong("addNotesFragment",0L) ?:0L
         viewModel.accept.invoke(NotesUiAction.UpdateCurrentNoteMenuId(menuId = menuId))
 
         binding.bindState(viewModel.uiState, viewModel.accept,viewModel.uiEvent)

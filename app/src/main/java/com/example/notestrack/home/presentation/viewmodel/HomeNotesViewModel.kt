@@ -3,16 +3,14 @@ package com.example.notestrack.home.presentation.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notestrack.addmenu.data.model.mapper.CategoryMapper.toNotesHomeMenuData
 import com.example.notestrack.core.domain.repository.MainRepository
 import com.example.notestrack.core.domain.repository.SessionPref
-import com.example.notestrack.core.presentation.MainUiAction
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import com.example.notestrack.profile.data.local.entity.UserDetailEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
@@ -61,7 +59,7 @@ class HomeNotesViewModel
             println("mainRepository.getUserRelationWithNotes >>>$relations")
             if (relations.isNotEmpty()){
                 _uiState.update { state->
-                    state.copy(homeCategoryList = relations.first().categoryTableEntity.map { it.categoryTableEntity.toNotesHomeMenuData() })
+                    state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData().sortedByDescending { it.createdAt })
                 }
             }
         }.launchIn(viewModelScope)

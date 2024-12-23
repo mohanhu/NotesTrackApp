@@ -11,7 +11,7 @@ data class NotesTableEntity(
     @ColumnInfo(name = NotesTable.Column.Notes_TITLE) val notesName: String = "",
     @ColumnInfo(name = NotesTable.Column.Notes_DESC) val notesDesc: String = "",
     @ColumnInfo(name = NotesTable.Column.NOTES_BLOCK) val notesBlock: String = "",
-    @ColumnInfo(name = NotesTable.Column.Notes_DATE) val date: String = "",
+    @ColumnInfo(name = NotesTable.Column.Notes_DATE) val date: Long = 0,
     @ColumnInfo(name = NotesTable.Column.Category_ID) val categoryId: Long = 0,
 )
 {

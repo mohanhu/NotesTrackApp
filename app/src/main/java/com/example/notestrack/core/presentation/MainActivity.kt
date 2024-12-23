@@ -1,8 +1,6 @@
 package com.example.notestrack.core.presentation
 
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -11,22 +9,22 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.notestrack.R
 import com.example.notestrack.databinding.ActivityMainBinding
+import com.example.notestrack.richlib.LoadBottomGlide
+import com.example.notestrack.richlib.LoadBottomGlide.loadGlideMenu
+import com.example.notestrack.richlib.LoadBottomGlide.resizeMenuIcon
 import com.example.notestrack.utils.ViewExtentions.makeGone
-import com.example.notestrack.utils.ViewExtentions.makeInVisible
 import com.example.notestrack.utils.ViewExtentions.makeVisible
-import com.google.android.material.navigation.NavigationBarView
+import com.example.notestrack.utils.theme.ThemeSwitch
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -54,7 +52,9 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        binding.bindState()
+        binding.bindState(
+            viewModel.uiState
+        )
 
         val sum = { a:Int, b :Int-> a+b}
 
@@ -69,20 +69,32 @@ class MainActivity : AppCompatActivity() {
         return sum.invoke(a,b)
     }
 
-    private fun ActivityMainBinding.bindState() {
+    private fun ActivityMainBinding.bindState(uiState: StateFlow<MainUiState>) {
 
         navControllerState()
 
-        bindUiDetails()
+        bindUiDetails(uiState)
 
     }
 
-    private fun ActivityMainBinding.bindUiDetails() {
-
-
+    private fun ActivityMainBinding.bindUiDetails(uiState: StateFlow<MainUiState>) {
+        uiState.map { it.isLightTheme }.onEach {
+            if (it){
+                ThemeSwitch.switchToLightTheme()
+            }else{
+                ThemeSwitch.switchToDarkTheme()
+            }
+        }.flowWithLifecycle(lifecycle,Lifecycle.State.STARTED)
+            .launchIn(lifecycleScope)
     }
 
     private fun ActivityMainBinding.navControllerState() {
+
+        LoadBottomGlide.also {
+            mainNavGraph.loadGlideMenu(this@MainActivity,R.id.profileFragment)
+            mainNavGraph.resizeMenuIcon()
+        }
+
         navController.graph = navGraph
         mainNavGraph.setupWithNavController(navController)
 
