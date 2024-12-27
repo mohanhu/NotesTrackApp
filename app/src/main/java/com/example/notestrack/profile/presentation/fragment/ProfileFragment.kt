@@ -11,6 +11,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.notestrack.R
 import com.example.notestrack.databinding.FragmentProfileBinding
 import com.example.notestrack.profile.presentation.dialog.EmojiPickerDialog
 import com.example.notestrack.profile.presentation.viewmodel.ProfileUiAction
@@ -116,6 +118,10 @@ class ProfileFragment : Fragment() {
                 }).also {
                 it.show()
             }
+        }
+
+        saveContainer.setOnClickListener {
+            findNavController().navigate(R.id.pinnedFragment)
         }
     }
 }

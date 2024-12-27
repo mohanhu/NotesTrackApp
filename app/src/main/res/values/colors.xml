@@ -150,4 +150,6 @@
     <color name="dark_blue">#00008B</color>
     <color name="navy">#000080</color>
     <color name="black">#000000</color>
+    <color name="view_color">#949494</color>
+    <color name="hint_color">#757575</color>
 </resources>

@@ -16,7 +16,7 @@ import com.example.notestrack.profile.data.local.entity.UserDetailEntity
      CategoryTableEntity::class,
      NotesTableEntity::class,
                 ],
-    version = 3,
+    version = 2,
     exportSchema = false
 )
 abstract class NotesDataBase :  RoomDatabase() {

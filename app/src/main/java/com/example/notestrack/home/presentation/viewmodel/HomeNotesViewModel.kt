@@ -50,7 +50,13 @@ class HomeNotesViewModel
             HomeNoteUiAction.FetchUserDetails -> {
                 fetchUserDetails()
             }
+
+            is HomeNoteUiAction.DeleteItem -> deleteItem(homeNoteUiAction.data)
         }
+    }
+
+    private fun deleteItem(data: NotesHomeMenuData) = viewModelScope.launch(Dispatchers.IO){
+        mainRepository.deleteCategory(data.menuNotesId)
     }
 
     private fun fetchUserDetails() = viewModelScope.launch(Dispatchers.IO) {
@@ -91,4 +97,5 @@ data class HomeNoteUiState(
 
 sealed interface HomeNoteUiAction {
     data object FetchUserDetails : HomeNoteUiAction
+    data class DeleteItem(val data: NotesHomeMenuData): HomeNoteUiAction
 }

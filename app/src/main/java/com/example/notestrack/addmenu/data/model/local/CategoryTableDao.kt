@@ -16,6 +16,9 @@ interface CategoryTableDao {
     @Query("DELETE FROM ${CategoryTable.TABLE_NAME}")
     suspend fun deleteAllCategory()
 
+    @Query("DELETE FROM ${CategoryTable.TABLE_NAME} WHERE ${CategoryTable.Column.Category_ID}=:menuId")
+    suspend fun deleteCategory(menuId:Long)
+
     @Query("SELECT * FROM ${CategoryTable.TABLE_NAME} WHERE ${CategoryTable.Column.Category_ID}=:categoryId")
     suspend fun selectCategoryDetails(categoryId:Long): CategoryWithNotesRelation
 

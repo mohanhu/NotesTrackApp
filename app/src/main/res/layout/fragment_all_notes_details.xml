@@ -50,24 +50,74 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/view_color"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:trackColor="@color/lime"
+            app:indicatorColor="@color/magenta"
+            android:indeterminate="true"
+            app:trackThickness="1dp"/>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/inset_small"
         android:layout_marginHorizontal="@dimen/inset_medium"
         android:nestedScrollingEnabled="true"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ev_search_back_ground"
+            android:cursorVisible="true"
+            android:layout_marginHorizontal="@dimen/inset_small"
+            android:drawableStart="@drawable/baseline_search_24"
+            android:drawablePadding="@dimen/inset_small"
+            android:hint="@string/search_here"
+            android:padding="@dimen/inset_medium"
+            android:paddingStart="@dimen/inset_medium"
+            android:textAppearance="@style/TextStyle.VerySmall"
+            android:textColor="?attr/colorSurface"
+            android:textColorHint="@color/black"
+            android:textCursorDrawable="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/place_lottie"
+            layout="@layout/placeholder_item_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/inset_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_image_choosen"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:orientation="vertical"
+            android:layout_marginTop="@dimen/inset_small"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_search"
             app:spanCount="3"
             tools:listitem="@layout/notes_template" />
 

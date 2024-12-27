@@ -2,6 +2,7 @@ package com.example.notestrack.home.presentation.adapter
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,7 +16,8 @@ import com.example.notestrack.utils.StringFormation.capitalise
 import com.example.notestrack.utils.convertMsToDateFormat
 
 class NotesHomeAdapter(
-    private val pick:(NotesHomeMenuData)->Unit
+    private val pick:(NotesHomeMenuData)->Unit,
+    private val longClick:(NotesHomeMenuData, View)->Unit
 ) :
     ListAdapter<NotesHomeMenuData, NotesHomeAdapter.ViewHolderOne>(DifferNotes) {
 
@@ -33,6 +35,10 @@ class NotesHomeAdapter(
             }
             itemView.setOnClickListener {
                 pick.invoke(data)
+            }
+            itemView.setOnLongClickListener {
+                longClick.invoke(data,binding.root)
+                true
             }
         }
     }

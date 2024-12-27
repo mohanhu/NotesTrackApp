@@ -1,6 +1,7 @@
 package com.example.notestrack.core.data.repository
 
 import android.content.Context
+import androidx.room.Transaction
 import com.example.notestrack.core.domain.repository.MainRepository
 import com.example.notestrack.core.local.NotesDataBase
 import com.example.notestrack.core.local.relation.UserWithCategoryRelation
@@ -29,5 +30,11 @@ class MainRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserNameImage(userName: String, userImage: String, userId: Long) {
         notesDataBase.userDetailDao.setUserDetails(userId, userName, userImage)
+    }
+
+    @Transaction
+    override suspend fun deleteCategory(menuId: Long) {
+        notesDataBase.categoryTableDao.deleteCategory(menuId)
+        notesDataBase.notesDao.deleteNotesByCategoryId(menuId)
     }
 }

@@ -130,7 +130,6 @@
                 android:layout_marginTop="@dimen/inset_small"
                 android:hint="@string/enter_username"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/primary"
                 app:counterEnabled="false"
                 app:counterMaxLength="80"
                 app:counterTextColor="@color/primary"
@@ -138,6 +137,7 @@
                 app:hintTextColor="@color/primary_dark"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:boxStrokeColor="@color/ev_selector_stroke"
                 app:layout_constraintTop_toBottomOf="@+id/tv_title_menu"
                 app:placeholderTextColor="@color/primary_dark">
 

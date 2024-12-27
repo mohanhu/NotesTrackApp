@@ -12,6 +12,7 @@
         android:id="@+id/addMenuFragment"
         android:enabled="true"
         android:icon="@drawable/plus_add_menu"
+        android:title=""
         android:tooltipText="@string/add" />
 
     <item

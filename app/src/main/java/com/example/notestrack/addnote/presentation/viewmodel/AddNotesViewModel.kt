@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notestrack.addnote.data.local.entity.NotesTableEntity
 import com.example.notestrack.addnote.domain.repository.NotesRepository
+import com.example.notestrack.notedetails.data.model.NotesData
 import com.example.notestrack.richlib.Rich
 import com.example.notestrack.richlib.RichEditDataClass
 import com.example.notestrack.richlib.RichTypeEnum
@@ -60,11 +61,49 @@ class AddNotesViewModel @Inject constructor(
                 checkValid()
             }
 
-            NotesUiAction.SubmitNotes -> submitNote()
+            NotesUiAction.SubmitNotes -> {
+                if (_uiState.value.editNotesId==0L){
+                    submitNote()
+                }
+                else{
+                    editSubmitNote()
+                }
+            }
             is NotesUiAction.UpdateCurrentNoteMenuId -> {
                 _uiState.update { it.copy(currentNoteMenuId = notesUiAction.menuId) }
             }
+
+            is NotesUiAction.EditNotesHomeMenuData -> updateEditStatus(notesUiAction.editData)
         }
+    }
+
+    private fun updateEditStatus(editData: NotesData) = viewModelScope.launch(Dispatchers.IO){
+        _uiState.update {
+            it.copy(
+                title = editData.notesName,
+                description = editData.notesDesc,
+                inputTextUpload = editData.notesBlock,
+                currentNoteMenuId = editData.categoryId,
+                editNotesId = editData.notesId
+            )
+        }
+    }
+
+    private fun editSubmitNote() =viewModelScope.launch(Dispatchers.IO){
+        notesRepository.addNotes(
+            NotesTableEntity(
+                notesId = _uiState.value.editNotesId,
+                notesName = _uiState.value.title,
+                notesDesc = _uiState.value.description,
+                notesBlock = _uiState.value.inputTextUpload,
+                categoryId = _uiState.value.currentNoteMenuId,
+                date = Instant.now().toEpochMilli()
+            )
+        )
+        _uiState.update { it.copy(editNotesId = 0L) }
+        sendUiEvent(NotesUiEvent.ShowSnackBar("Notes Edited Successfully 🎉"))
+        delay(1000)
+        sendUiEvent(NotesUiEvent.NavigateToBack)
     }
 
     private fun submitNote() =viewModelScope.launch(Dispatchers.IO){
@@ -77,6 +116,7 @@ class AddNotesViewModel @Inject constructor(
                 date = Instant.now().toEpochMilli()
             )
         )
+        _uiState.update { it.copy(editNotesId = 0L) }
         sendUiEvent(NotesUiEvent.ShowSnackBar("Notes Added Successfully 🎉"))
         delay(1000)
         sendUiEvent(NotesUiEvent.NavigateToBack)
@@ -135,6 +175,7 @@ sealed interface NotesUiAction{
     data class TypeStateOfDescription(val description:String): NotesUiAction
     data object SubmitNotes: NotesUiAction
     data class UpdateCurrentNoteMenuId(val menuId:Long): NotesUiAction
+    data class EditNotesHomeMenuData(val editData: NotesData): NotesUiAction
 }
 
 data class NotesUiState(
@@ -143,7 +184,8 @@ data class NotesUiState(
     val inputTextUpload: String="",
     val title:String="",
     val description:String="",
-    val isButtonEnabled:Boolean = false
+    val isButtonEnabled:Boolean = false,
+    val editNotesId: Long = 0
 )
 
 sealed interface NotesUiEvent{

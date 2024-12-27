@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -18,13 +19,16 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.notestrack.R
 import com.example.notestrack.addnote.presentation.adapter.RichStyleAdapter
 import com.example.notestrack.addnote.presentation.viewmodel.AddNotesViewModel
 import com.example.notestrack.addnote.presentation.viewmodel.NotesUiAction
 import com.example.notestrack.addnote.presentation.viewmodel.NotesUiEvent
 import com.example.notestrack.addnote.presentation.viewmodel.NotesUiState
 import com.example.notestrack.databinding.FragmentAddNotesBinding
+import com.example.notestrack.notedetails.data.model.NotesData
 import com.example.notestrack.richlib.RichTypeEnum
+import com.example.notestrack.richlib.spanrichlib.BlockExport.blockJsonExportToEdit
 import com.example.notestrack.richlib.spanrichlib.BlockKit.blockKitListGenerate
 import com.example.notestrack.richlib.spanrichlib.BulletOrdering.addBulletList
 import com.example.notestrack.richlib.spanrichlib.BulletOrdering.bulletFormatForward
@@ -34,6 +38,7 @@ import com.example.notestrack.richlib.spanrichlib.NumberOrdering.toFormatNumberB
 import com.example.notestrack.richlib.spanrichlib.RichSpanDownStyle.listenCurrentStyleFormat
 import com.example.notestrack.richlib.spanrichlib.RichSpanDownStyle.onTypeStateChange
 import com.example.notestrack.richlib.spanrichlib.RichSpanDownStyle.toggleStyle
+import com.example.notestrack.richlib.spanrichlib.StyleActionBindClick.showDialogSpanLink
 import com.example.notestrack.richlib.spanrichlib.Styles
 import com.example.notestrack.utils.ViewExtentions.showKeyBoard
 import com.google.android.material.snackbar.Snackbar
@@ -67,9 +72,6 @@ class AddNotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val menuId = arguments?.getLong("addNotesFragment",0L) ?:0L
-        viewModel.accept.invoke(NotesUiAction.UpdateCurrentNoteMenuId(menuId = menuId))
-
         binding.bindState(viewModel.uiState, viewModel.accept,viewModel.uiEvent)
     }
 
@@ -79,11 +81,33 @@ class AddNotesFragment : Fragment() {
         uiEvent: SharedFlow<NotesUiEvent>
     ) {
 
+        bundleExtraction()
+
         bindList(uiState, accept)
 
         onClick(accept)
 
         bindEvent(uiEvent)
+    }
+
+    private fun bundleExtraction() {
+
+        val menuId = arguments?.getLong("addNotesFragment",0L) ?:0L
+        viewModel.accept.invoke(NotesUiAction.UpdateCurrentNoteMenuId(menuId = menuId))
+
+        if (arguments?.containsKey("editNotesFragment") == true){
+            val bundle = arguments?.getParcelable<NotesData>("editNotesFragment")?:NotesData()
+
+            binding.apply {
+                tvUserName.text = ContextCompat.getString(requireContext(), R.string.edit_notes)
+                viewModel.accept.invoke(NotesUiAction.EditNotesHomeMenuData(bundle))
+                evTitle.setText(bundle.notesName)
+                evTitle.postDelayed({
+                    evTitle.showKeyBoard()
+                },50)
+                evDesc.blockJsonExportToEdit(blockJson = bundle.notesBlock)
+            }
+        }
     }
 
     private fun FragmentAddNotesBinding.bindEvent(uiEvent: SharedFlow<NotesUiEvent>) {
@@ -106,6 +130,8 @@ class AddNotesFragment : Fragment() {
     private fun FragmentAddNotesBinding.onClick(accept: (NotesUiAction) -> Unit) {
 
         evTitle.showKeyBoard()
+
+        ivBack.setOnClickListener { findNavController().popBackStack() }
 
         evDesc.setOnFocusChangeListener { _, b ->
             rvStyleMark.isVisible = b
@@ -206,7 +232,9 @@ class AddNotesFragment : Fragment() {
                     RichTypeEnum.UNDER_LINE -> {
                         toggleWithUpdateStyle(it.richType,Styles.UNDER_LINE)
                     }
-                    RichTypeEnum.ADD_LINK -> Unit
+                    RichTypeEnum.ADD_LINK -> {
+                        evDesc.showDialogSpanLink(requireContext())
+                    }
                     RichTypeEnum.ALIGN_LEFT -> Unit
                     RichTypeEnum.ALIGN_RIGHT -> Unit
                     RichTypeEnum.ALIGN_CENTER -> Unit

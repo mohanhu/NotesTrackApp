@@ -28,4 +28,8 @@
         android:id="@+id/allNotesDetailsFragment"
         android:name="com.example.notestrack.notedetails.presentation.fragment.AllNotesDetailsFragment"
         android:label="AllNotesDetailsFragment" />
+    <fragment
+        android:id="@+id/pinnedFragment"
+        android:name="com.example.notestrack.notedetails.presentation.fragment.PinnedFragment"
+        android:label="PinnedFragment" />
 </navigation>

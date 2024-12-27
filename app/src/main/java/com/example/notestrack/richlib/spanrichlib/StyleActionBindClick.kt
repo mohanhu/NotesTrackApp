@@ -1,14 +1,21 @@
 package com.example.notestrack.richlib.spanrichlib
 
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
+import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.example.notestrack.R
+import com.example.notestrack.databinding.RichTextAddLinkUiBinding
+import com.example.notestrack.utils.ViewExtentions.showKeyBoard
 import com.example.notestrack.utils.safeCall
 
 
@@ -62,48 +69,48 @@ object StyleActionBindClick {
         movementMethod = LinkMovementMethod.getInstance()
     }
 
-//    fun EditText.showDialogSpanLink(context: Context) {
-//
-//        val start = selectionStart
-//        val end = selectionEnd
-//        val longPressText = text.toString().substring(start,end)
-//
-//        val alertDialogBuilder = AlertDialog.Builder(context, R.style.custom_style_dialog)
-//        val dialogView = alertDialogBuilder.create()
-//        val customAlertUi = RichTextAddLinkUiBinding.inflate(LayoutInflater.from(context))
-//        customAlertUi.evTitle.setText(longPressText)
-//        safeCall { customAlertUi.evTitle.setSelection(longPressText.length) } // Not mandatory
-//
-//        dialogView.let { dialog ->
-//            dialog.setView(customAlertUi.root)
-//            dialog.setCancelable(true)
-//            dialog.setCanceledOnTouchOutside(true)
-//            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//            if(!dialog.isShowing){
-//                dialog.show()
-//            }
-//            customAlertUi.evTitle.showKeyboardAndFocus()
-//        }
-//
-//        customAlertUi.doneText.setOnDebounceListener{
-//            if (customAlertUi.evTitle.text?.trim().toString().isNotEmpty()){
-//                val evLink = customAlertUi.evLink.text.toString().trim().replace("\\s+".toRegex(), "")
-//
-//                /** Not valid point but need for IOS view Conversion */
-//                val formattedLink = if (!evLink.startsWith("http")  && !evLink.contains(".com")) {
-//                    "https://$evLink.com"
-//                } else {
-//                    evLink
-//                }
-//                addLinkSpanText(title = customAlertUi.evTitle.text.toString().trim(), url = formattedLink)
-//                dialogView.dismiss()
-//            }
-//            else{
-//                dialogView.dismiss()
-//            }
-//        }
-//        customAlertUi.negativeText.setOnDebounceListener { dialogView.dismiss() }
-//    }
+    fun EditText.showDialogSpanLink(context: Context) {
+
+        val start = selectionStart
+        val end = selectionEnd
+        val longPressText = text.toString().substring(start,end)
+
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        val dialogView = alertDialogBuilder.create()
+        val customAlertUi = RichTextAddLinkUiBinding.inflate(LayoutInflater.from(context))
+        customAlertUi.evTitle.setText(longPressText)
+        safeCall { customAlertUi.evTitle.setSelection(longPressText.length) } // Not mandatory
+
+        dialogView.let { dialog ->
+            dialog.setView(customAlertUi.root)
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(true)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            if(!dialog.isShowing){
+                dialog.show()
+            }
+            customAlertUi.evTitle.showKeyBoard()
+        }
+
+        customAlertUi.doneText.setOnClickListener{
+            if (customAlertUi.evTitle.text?.trim().toString().isNotEmpty()){
+                val evLink = customAlertUi.evLink.text.toString().trim().replace("\\s+".toRegex(), "")
+
+                /** Not valid point but need for IOS view Conversion */
+                val formattedLink = if (!evLink.startsWith("http")  && !evLink.contains(".com")) {
+                    "https://$evLink.com"
+                } else {
+                    evLink
+                }
+                addLinkSpanText(title = customAlertUi.evTitle.text.toString().trim(), url = formattedLink)
+                dialogView.dismiss()
+            }
+            else{
+                dialogView.dismiss()
+            }
+        }
+        customAlertUi.negativeText.setOnClickListener { dialogView.dismiss() }
+    }
 
     private fun EditText.addLinkSpanText(title:String, url: String) {
         safeCall {

@@ -49,6 +49,11 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/view_color"
+            app:layout_constraintBottom_toBottomOf="parent" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -85,7 +90,7 @@
                 android:layout_marginTop="@dimen/inset_small"
                 android:hint="@string/enter_category_title"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/primary"
+                app:boxStrokeColor="@color/ev_selector_stroke"
                 app:counterEnabled="false"
                 app:counterMaxLength="80"
                 app:counterTextColor="@color/primary"

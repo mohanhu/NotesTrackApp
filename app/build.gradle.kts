@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.parcelize)
 //    alias(libs.plugins.google.gms.google.services)
 //    alias(libs.plugins.crash)
 }
@@ -136,6 +137,28 @@ dependencies {
     implementation (libs.skydoves.colorPicker)
 
     implementation (libs.bundles.markdown)
+
+    testImplementation("com.google.truth:truth:1.0.1")
+    // Local Unit Tests
+    testImplementation ("org.hamcrest:hamcrest-all:1.3")
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    testImplementation ("org.robolectric:robolectric:4.3.1")
+    testImplementation( "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1")
+    testImplementation ("com.google.truth:truth:1.0.1")
+    testImplementation ("org.mockito:mockito-core:2.21.0")
+
+    // Instrumented Unit Tests
+    androidTestImplementation ("junit:junit:4.13")
+    androidTestImplementation ("com.linkedin.dexmaker:dexmaker-mockito:2.12.1")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1")
+    androidTestImplementation ("androidx.arch.core:core-testing:2.1.0")
+    androidTestImplementation( "com.google.truth:truth:1.0.1")
+    androidTestImplementation( "androidx.test.ext:junit:1.1.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation ("org.mockito:mockito-core:2.21.0")
+    androidTestImplementation( "com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
+
+
 //    implementation(libs.firebase.crashlytics)
 //    implementation(libs.analytics)
 }

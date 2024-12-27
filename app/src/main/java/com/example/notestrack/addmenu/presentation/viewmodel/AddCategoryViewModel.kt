@@ -1,14 +1,13 @@
 package com.example.notestrack.addmenu.presentation.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.notestrack.addmenu.data.model.local.CategoryTableEntity
 import com.example.notestrack.addmenu.domain.repository.AddCategoryRepository
 import com.example.notestrack.core.domain.repository.SessionPref
+import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,7 +26,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddCategoryViewModel @Inject constructor(
-    @ApplicationContext context: Context,
     private val addCategoryRepository: AddCategoryRepository,
     private val sessionPref: SessionPref
 ): ViewModel(){
@@ -71,9 +69,46 @@ class AddCategoryViewModel @Inject constructor(
                     _uiState.update { it.copy(color = addCategoryUiAction.color) }
                 }
 
-                AddCategoryUiAction.SubmitMenuCategory -> submitMenuCategory()
+                AddCategoryUiAction.SubmitMenuCategory -> {
+                    if (_uiState.value.menuEditId==0L){
+                        submitMenuCategory()
+                    }
+                    else{
+                        editSubmitMenuCategory()
+                    }
+                }
+
+                is AddCategoryUiAction.EditNotesHomeMenuData -> editCategoryData(addCategoryUiAction.edit)
             }
         }
+    }
+
+    private fun editCategoryData(edit: NotesHomeMenuData) = viewModelScope.launch(Dispatchers.IO){
+        _uiState.update {
+            it.copy(
+                categoryTitle = edit.menuTitle,
+                categoryImage = edit.thumbNail,
+                color = edit.pickedColor,
+                menuEditId = edit.menuNotesId
+            )
+        }
+    }
+
+    private suspend fun editSubmitMenuCategory() = viewModelScope.launch(Dispatchers.IO){
+        addCategoryRepository.insertMenuCategory(
+            CategoryTableEntity(
+                categoryId = _uiState.value.menuEditId,
+                categoryName = _uiState.value.categoryTitle,
+                categoryImage = _uiState.value.categoryImage,
+                color = _uiState.value.color.ifEmpty { "2CC2EC" },
+                userId = userId,
+                date = Instant.now().toEpochMilli()
+            )
+        )
+        _uiState.update { it.copy(menuEditId = 0) }
+        sendUiEvent(AddCategoryUiEvent.ShowSnackBar("Category Edited Successfully 🎉"))
+        delay(500)
+        sendUiEvent(AddCategoryUiEvent.BackStack)
     }
 
     private fun submitMenuCategory() = viewModelScope.launch(Dispatchers.IO){
@@ -86,6 +121,7 @@ class AddCategoryViewModel @Inject constructor(
                 date = Instant.now().toEpochMilli()
             )
         )
+        _uiState.update { it.copy(menuEditId = 0) }
         sendUiEvent(AddCategoryUiEvent.ShowSnackBar("Category Added Successfully 🎉"))
         delay(500)
         sendUiEvent(AddCategoryUiEvent.BackStack)
@@ -112,6 +148,8 @@ sealed interface AddCategoryUiAction{
     data class TypingTitle(val title:String): AddCategoryUiAction
 
     data class ChooseColorCardStroke(val color:String): AddCategoryUiAction
+
+    data class EditNotesHomeMenuData(val edit: NotesHomeMenuData): AddCategoryUiAction
 }
 
 sealed interface AddCategoryUiEvent{
@@ -123,5 +161,6 @@ data class AddCategoryUiState(
     val categoryImage:String = "https://projectsly.com/images/blog/task-management-strategies.png?v=1686553999071005322",
     val categoryTitle:String = "",
     val color:String = "#2CC2EC",
-    val buttonEnable:Boolean = false
+    val buttonEnable:Boolean = false,
+    val menuEditId:Long = 0
 )

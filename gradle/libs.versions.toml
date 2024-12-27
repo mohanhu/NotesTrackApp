@@ -58,6 +58,8 @@ playServicesAuth = "21.2.0"
 minSdk = "28"
 targetSdk = "34"
 emoji2Emojipicker = "1.5.0"
+junitVersion = "4.12"
+coreKtx = "1.6.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -143,3 +145,4 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 crash = { id = "com.google.firebase.crashlytics", version.ref = "firebasecrash" }
+parcelize = { id  = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin"}

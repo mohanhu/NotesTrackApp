@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.example.notestrack.R
 import com.example.notestrack.addmenu.domain.model.Photo
 import com.example.notestrack.addmenu.presentation.adapter.AddCardImageAdapter
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiAction
@@ -25,6 +27,8 @@ import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiEvent
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryUiState
 import com.example.notestrack.addmenu.presentation.viewmodel.AddCategoryViewModel
 import com.example.notestrack.databinding.FragmentAddMenuBinding
+import com.example.notestrack.home.domain.model.NotesHomeMenuData
+import com.example.notestrack.utils.ViewExtentions.showKeyBoard
 import com.example.notestrack.utils.convertMsToDateFormat
 import com.google.android.material.snackbar.Snackbar
 import com.skydoves.colorpickerview.ColorEnvelope
@@ -74,6 +78,8 @@ class AddMenuFragment : Fragment() {
         uiEvent: SharedFlow<AddCategoryUiEvent>
     ) {
 
+        bundleExtraction()
+
         bindList(imageListPaging,accept)
 
         onClickListener(accept)
@@ -81,6 +87,18 @@ class AddMenuFragment : Fragment() {
         observerCardList(uiState)
 
         eventListener(uiEvent)
+    }
+
+    private fun bundleExtraction() {
+        if (arguments?.containsKey("addMenuFragment") == true){
+            val bundle = arguments?.getParcelable<NotesHomeMenuData>("addMenuFragment")?: NotesHomeMenuData()
+            binding.apply {
+                evTitle.setText(bundle.menuTitle)
+                evTitle.showKeyBoard()
+                tvUserName.text = ContextCompat.getString(requireContext(), R.string.edit_category)
+            }
+            viewModel.accept.invoke(AddCategoryUiAction.EditNotesHomeMenuData(bundle))
+        }
     }
 
     private fun eventListener(uiEvent: SharedFlow<AddCategoryUiEvent>) {

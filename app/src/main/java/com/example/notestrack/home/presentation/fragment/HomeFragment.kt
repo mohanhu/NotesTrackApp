@@ -1,10 +1,13 @@
 package com.example.notestrack.home.presentation.fragment
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -55,7 +58,7 @@ class HomeFragment : Fragment() {
         uiState: StateFlow<HomeNoteUiState>,
         accept: (HomeNoteUiAction) -> Unit) {
 
-        bindList(uiState.map { it.homeCategoryList })
+        bindList(uiState.map { it.homeCategoryList },accept)
 
         bindUiDetails(uiState.map { it.userDetailEntity })
 
@@ -70,18 +73,41 @@ class HomeFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun FragmentHomeBinding.bindList(listFlow: Flow<List<NotesHomeMenuData>>) {
+    private fun FragmentHomeBinding.bindList(
+        listFlow: Flow<List<NotesHomeMenuData>>,
+        accept: (HomeNoteUiAction) -> Unit
+    ) {
         rvNotesTitle.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         val adapter = NotesHomeAdapter(
             pick = {
                 val bundle = bundleOf("addNotesFragment" to it.menuNotesId)
                 findNavController().navigate(R.id.allNotesDetailsFragment,bundle)
+            },
+            longClick = { data,view->
+                PopupMenu(requireContext(),view,Gravity.END).also {
+                    it.inflate(R.menu.home_menu_item)
+                    it.setOnMenuItemClickListener { menu->
+                        when(menu.itemId){
+                            R.id.delete->{
+                                accept.invoke(HomeNoteUiAction.DeleteItem(data))
+                            }
+                            R.id.edit->{
+                                val bundle = bundleOf("addMenuFragment" to data)
+                                findNavController().navigate(R.id.addMenuFragment,bundle)
+                            }
+                        }
+                        true
+                    }
+                    it.show()
+                }
             }
         )
         rvNotesTitle.adapter = adapter
 
         listFlow.distinctUntilChanged().onEach { data->
             adapter.submitList(data)
+            rvNotesTitle.isVisible = data.isNotEmpty()
+            placeLottie.root.isVisible = data.isEmpty()
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }

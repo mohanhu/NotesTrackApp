@@ -14,4 +14,6 @@ interface MainRepository {
     suspend fun insertUserDetails(userDetailEntity: UserDetailEntity)
 
     suspend fun updateUserNameImage(userName: String, userImage: String,userId: Long)
+
+    suspend fun deleteCategory(menuId:Long)
 }
