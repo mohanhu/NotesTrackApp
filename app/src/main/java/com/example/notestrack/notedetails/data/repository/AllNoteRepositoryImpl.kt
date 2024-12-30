@@ -6,8 +6,11 @@ import com.example.notestrack.core.local.NotesDataBase
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import com.example.notestrack.notedetails.data.model.NotesData
 import com.example.notestrack.notedetails.domain.repository.AllNoteRepository
+import com.example.notestrack.utils.convertMsToDateFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -18,6 +21,18 @@ class AllNoteRepositoryImpl @Inject constructor(
 
     override suspend fun fetchNotesAll(): Flow<List<NotesData>> {
         return notesDataBase.notesDao.getNotes().map { entities -> entities.map { it.toNotesData() }.sortedByDescending { it.date } }
+    }
+
+    override suspend fun fetchNotesWhereEqualToDate(
+        dateInMs: Long,
+        menuId: Long
+    ): Flow<List<NotesData>> {
+        return notesDataBase.notesDao.getAllNotes(menuId)
+            .map {
+            entities -> entities.map { it.toNotesData() }.filter {
+                convertMsToDateFormat(it.date) == convertMsToDateFormat(dateInMs)
+            }.sortedByDescending { it.date }
+        }
     }
 
     override suspend fun fetchNotesByMenuId(menuId: Long): Flow<List<NotesData>> {

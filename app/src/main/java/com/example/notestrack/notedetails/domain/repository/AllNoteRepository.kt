@@ -8,6 +8,8 @@ interface AllNoteRepository {
 
     suspend fun fetchNotesByMenuId(menuId: Long): Flow<List<NotesData>>
 
+    suspend fun fetchNotesWhereEqualToDate(dateInMs: Long,menuId: Long): Flow<List<NotesData>>
+
     suspend fun fetchNotesAll(): Flow<List<NotesData>>
 
     suspend fun fetchCategoryMenuId(menuId: Long): NotesHomeMenuData

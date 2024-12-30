@@ -3,21 +3,29 @@ package com.example.notestrack.notedetails.presentation.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notestrack.addmenu.data.model.mapper.CategoryMapper.toNotesHomeMenuData
 import com.example.notestrack.addnote.data.local.entity.NotesTableEntity
 import com.example.notestrack.addnote.domain.repository.NotesRepository
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
+import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
 import com.example.notestrack.notedetails.data.model.NotesData
 import com.example.notestrack.notedetails.domain.repository.AllNoteRepository
+import com.example.notestrack.utils.convertMsToDateFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,8 +42,34 @@ class AllNoteViewModel @Inject constructor(
 
     val accept: (AllNoteUiAction)->Unit
 
+    private var homejob:Job?= null
+
     init {
         accept = ::onUiAction
+
+        uiState.map { it.selectedPickedDate }.distinctUntilChanged().onEach {
+            if (it==0L){
+                fetchNotes()
+            }
+            else{
+                fetchDetailsWhereEqualByDate(it)
+            }
+        }.launchIn(viewModelScope)
+
+        uiState.map { it.searchQuery }.distinctUntilChanged().onEach { search->
+            search.ifEmpty { fetchDetailsWhereEqualByDate(
+                uiState.value.selectedPickedDate.takeIf { it>0L }?: Instant.now().toEpochMilli()
+            ) }
+            search.also { query->
+                _uiState.value.notesData.filter {
+                    it.notesDesc.lowercase().contains(query.lowercase())||
+                    it.notesName.lowercase().contains(query.lowercase())||
+                    convertMsToDateFormat(it.date).lowercase().contains(query.lowercase())
+                }.also { state->
+                    _uiState.update { it.copy(notesData = state) }
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun onUiAction(allNoteUiAction: AllNoteUiAction) {
@@ -43,11 +77,19 @@ class AllNoteViewModel @Inject constructor(
             is AllNoteUiAction.FetchNotesByMenuId -> {
                 _uiState.update { it.copy(currentNoteMenuId = allNoteUiAction.menuId) }
                 fetchNotes()
+                fetchHeader()
             }
 
             is AllNoteUiAction.DeleteItem -> deleteItem(allNoteUiAction.notesId)
             is AllNoteUiAction.UpdatePinStatus ->  updatePinStatus(allNoteUiAction.notesId,allNoteUiAction.pinnedStatus)
             is AllNoteUiAction.UndoAction -> undoAction(allNoteUiAction.data)
+            is AllNoteUiAction.DatePickerFilter -> {
+                _uiState.update { it.copy(selectedPickedDate = allNoteUiAction.date) }
+            }
+
+            is AllNoteUiAction.OnTypeToSearch -> {
+                _uiState.update { it.copy(searchQuery = allNoteUiAction.search) }
+            }
         }
     }
 
@@ -73,14 +115,8 @@ class AllNoteViewModel @Inject constructor(
         allNoteRepository.deleteNotesId(notesId)
     }
 
-    private fun fetchNotes() = viewModelScope.launch(Dispatchers.IO){
+    private fun fetchHeader() = viewModelScope.launch(Dispatchers.IO){
         val menuId = _uiState.value.currentNoteMenuId
-        allNoteRepository.fetchNotesByMenuId(menuId).onEach { ent->
-            _uiState.update {
-                it.copy(notesData = ent)
-            }
-        }.launchIn(viewModelScope)
-
         allNoteRepository.fetchCategoryMenuId(menuId).also { ent->
             _uiState.update {
                 it.copy(notesHomeMenuData = ent)
@@ -88,12 +124,38 @@ class AllNoteViewModel @Inject constructor(
         }
     }
 
+    private fun fetchNotes() = viewModelScope.launch(Dispatchers.IO){
+        val menuId = _uiState.value.currentNoteMenuId
+        if (homejob?.isActive == true) {
+            homejob?.cancel(CancellationException("New One Come"))
+        }
+        homejob = allNoteRepository.fetchNotesByMenuId(menuId).onEach { ent->
+            _uiState.update {
+                it.copy(notesData = ent)
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun fetchDetailsWhereEqualByDate(dateInMs: Long) = viewModelScope.launch(Dispatchers.IO){
+        if (homejob?.isActive == true) {
+            homejob?.cancel(CancellationException("New One Come"))
+        }
+        val menuId = _uiState.value.currentNoteMenuId
+        homejob = allNoteRepository.fetchNotesWhereEqualToDate(dateInMs = dateInMs, menuId = menuId).onEach { relations ->
+            println("mainRepository.getUserRelationWithNotes >>>$relations")
+            _uiState.update { state->
+                state.copy(notesData = relations)
+            }
+        }.launchIn(viewModelScope)
+    }
 }
 
 data class AllNoteUiState(
     val notesData: List<NotesData> = listOf(),
     val currentNoteMenuId:Long = 0,
-    val notesHomeMenuData: NotesHomeMenuData=NotesHomeMenuData()
+    val notesHomeMenuData: NotesHomeMenuData=NotesHomeMenuData(),
+    val selectedPickedDate:Long = 0L,
+    val searchQuery:String = ""
 )
 
 sealed interface AllNoteUiAction{
@@ -101,4 +163,6 @@ sealed interface AllNoteUiAction{
     data class DeleteItem(val notesId: Long) : AllNoteUiAction
     data class UpdatePinStatus(val pinnedStatus: Boolean, val notesId: Long): AllNoteUiAction
     data class UndoAction(val data: NotesData): AllNoteUiAction
+    data class DatePickerFilter(val date:Long): AllNoteUiAction
+    data class OnTypeToSearch(val search:String): AllNoteUiAction
 }

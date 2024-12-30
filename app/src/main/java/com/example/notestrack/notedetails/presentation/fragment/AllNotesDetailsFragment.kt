@@ -1,6 +1,9 @@
 package com.example.notestrack.notedetails.presentation.fragment
 
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -17,12 +20,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notestrack.R
 import com.example.notestrack.databinding.FragmentAllNotesDetailsBinding
+import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
 import com.example.notestrack.notedetails.presentation.adapter.NotesDataAdapter
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteUiAction
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteUiState
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteViewModel
 import com.example.notestrack.utils.StringFormation.capitalise
+import com.example.notestrack.utils.convertMsToDateFormat
 import com.example.notestrack.utils.redirectBasedOnPattern
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +38,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.time.Instant
+import java.time.ZoneId
+import java.util.Calendar
+import java.util.TimeZone
 
 @AndroidEntryPoint
 class AllNotesDetailsFragment : Fragment() {
@@ -74,6 +86,39 @@ class AllNotesDetailsFragment : Fragment() {
         uiState: StateFlow<AllNoteUiState>
     ) {
 
+        calender.setOnClickListener {
+            val today = Calendar.getInstance().apply {
+                timeZone = TimeZone.getTimeZone(ZoneId.systemDefault())
+            }
+
+            val currentInMs = uiState.value.selectedPickedDate.takeIf { it>0 }?: Instant.now().toEpochMilli()
+
+            val calendarConstraints = CalendarConstraints.Builder()
+            calendarConstraints.setValidator(DateValidatorPointBackward.before(today.timeInMillis))
+//            calendarConstraints.setStart(today.timeInMillis)
+//            today.add(Calendar.YEAR,1)
+//            today.set(Calendar.MONTH,11)
+            calendarConstraints.setEnd(today.timeInMillis)
+
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Pick Date 📆")
+                .setSelection(currentInMs)
+                .setCalendarConstraints(calendarConstraints.build())
+                .build().also { picker->
+                    picker.show(childFragmentManager,"MaterialDatePicker")
+                }
+                .also {
+                    it.addOnPositiveButtonClickListener { item->
+                        etSearch.setText("")
+                        accept.invoke(AllNoteUiAction.DatePickerFilter(item))
+                    }
+                }
+        }
+
+        tvDateOfSelection.setOnClickListener {
+            accept.invoke(AllNoteUiAction.DatePickerFilter(0))
+        }
+
         ivBack.setOnClickListener { findNavController().popBackStack() }
 
         floatAdd.setOnClickListener {
@@ -81,6 +126,28 @@ class AllNotesDetailsFragment : Fragment() {
             val bundle = bundleOf("addNotesFragment" to menuId)
             findNavController().navigate(R.id.addNotesFragment,bundle)
         }
+
+        uiState.map { it.selectedPickedDate }.onEach {
+            tvDateOfSelection.isVisible = it!=0L
+            tvDateOfSelection.text = convertMsToDateFormat(it)
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+
+        etSearch.addTextChangedListener(object : TextWatcher {
+            lateinit var countDownTimer: CountDownTimer
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+            override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                countDownTimer = object : CountDownTimer(100,200){
+                    override fun onTick(p0: Long) {
+                        accept.invoke(AllNoteUiAction.OnTypeToSearch(s.toString()))
+                    }
+                    override fun onFinish() {
+                    }
+                }.start()
+            }
+        })
     }
 
     private fun FragmentAllNotesDetailsBinding.bindList(
