@@ -88,6 +88,7 @@
             android:drawablePadding="@dimen/inset_small"
             android:hint="@string/search_here"
             android:padding="@dimen/inset_medium"
+            android:inputType="text"
             android:paddingStart="@dimen/inset_medium"
             android:textAppearance="@style/TextStyle.VerySmall"
             android:textColor="?attr/colorSurface"
@@ -101,17 +102,19 @@
             android:id="@+id/place_lottie"
             layout="@layout/placeholder_item_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginTop="@dimen/inset_small"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_search"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_image_choosen"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:visibility="gone"
             android:orientation="vertical"
             android:layout_marginTop="@dimen/inset_small"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

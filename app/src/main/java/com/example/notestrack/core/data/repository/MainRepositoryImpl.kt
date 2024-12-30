@@ -6,6 +6,7 @@ import com.example.notestrack.core.domain.repository.MainRepository
 import com.example.notestrack.core.local.NotesDataBase
 import com.example.notestrack.core.local.relation.UserWithCategoryRelation
 import com.example.notestrack.profile.data.local.entity.UserDetailEntity
+import com.example.notestrack.utils.convertMsToDateFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -20,8 +21,27 @@ class MainRepositoryImpl @Inject constructor(
         return notesDataBase.userDetailDao.getUserDetailsFlow()
     }
 
+    @Transaction
+    override suspend fun getUserRelationWithNotesWhereEqualToDate(userId: Long,date:Long): Flow<List<UserWithCategoryRelation>> {
+        return notesDataBase.userDetailDao.getUserRelationWithNotes(userId).map { list->
+            list.map { cate->
+                cate.copy(
+                    categoryTableEntity = cate.categoryTableEntity.filter { convertMsToDateFormat(it.categoryTableEntity.date)== convertMsToDateFormat(date) }
+                        .sortedByDescending { it.categoryTableEntity.date }
+                )
+            }
+        }
+    }
+
+    @Transaction
     override suspend fun getUserRelationWithNotes(userId: Long): Flow<List<UserWithCategoryRelation>> {
-        return notesDataBase.userDetailDao.getUserRelationWithNotes(userId)
+        return notesDataBase.userDetailDao.getUserRelationWithNotes(userId).map { list->
+            list.map { cate->
+                cate.copy(
+                    categoryTableEntity = cate.categoryTableEntity.sortedByDescending { it.categoryTableEntity.date }
+                )
+            }
+        }
     }
 
     override suspend fun insertUserDetails(userDetailEntity: UserDetailEntity) {

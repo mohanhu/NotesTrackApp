@@ -11,6 +11,8 @@ interface MainRepository {
 
     suspend fun getUserRelationWithNotes(userId: Long): Flow<List<UserWithCategoryRelation>>
 
+    suspend fun getUserRelationWithNotesWhereEqualToDate(userId: Long,date:Long): Flow<List<UserWithCategoryRelation>>
+
     suspend fun insertUserDetails(userDetailEntity: UserDetailEntity)
 
     suspend fun updateUserNameImage(userName: String, userImage: String,userId: Long)

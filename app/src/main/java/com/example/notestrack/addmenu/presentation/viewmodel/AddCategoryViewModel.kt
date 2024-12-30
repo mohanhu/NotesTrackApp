@@ -137,6 +137,11 @@ class AddCategoryViewModel @Inject constructor(
     private fun sendUiEvent(addCategoryUiEvent: AddCategoryUiEvent)= viewModelScope.launch(Dispatchers.IO){
         _uiEvent.emit(addCategoryUiEvent)
     }
+
+    /***/
+    fun insertCategory(categoryTableEntity: CategoryTableEntity) : List<CategoryTableEntity> {
+        return listOf<CategoryTableEntity>(categoryTableEntity)
+    }
 }
 
 sealed interface AddCategoryUiAction{

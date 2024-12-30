@@ -1,14 +1,15 @@
 package com.example.notestrack.notes.data.local.dao
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.notestrack.addnote.data.local.dao.NotesDao
 import com.example.notestrack.addnote.data.local.entity.NotesTableEntity
 import com.example.notestrack.core.local.NotesDataBase
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -16,26 +17,34 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
+import javax.inject.Named
 
-@RunWith(AndroidJUnit4::class)
+@ExperimentalCoroutinesApi
 @SmallTest
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
 class NotesDaoTest {
 
-    @get:Rule
-    private val instantTaskExecutorRule = InstantTaskExecutorRule()
+    @Inject
+    @Named("db_testing")
+    lateinit var notesDataBase: NotesDataBase
 
-    private lateinit var notesDataBase: NotesDataBase
-    private lateinit var notesDao: NotesDao
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @Inject
+    @Named("Notes_Dao")
+    lateinit var notesDao: NotesDao
 
 
     @Before
     fun setUp(){
-        notesDataBase = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            NotesDataBase::class.java
-        ).allowMainThreadQueries().fallbackToDestructiveMigration().build()
-
-        notesDao = notesDataBase.notesDao
+        hiltRule.inject()
+//        notesDao = notesDataBase.notesDao
     }
 
     @After

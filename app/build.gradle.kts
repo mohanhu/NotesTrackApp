@@ -20,7 +20,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.notestrack.HiltTestRunner"
     }
 
     buildTypes {
@@ -139,6 +139,10 @@ dependencies {
     implementation (libs.bundles.markdown)
 
     testImplementation("com.google.truth:truth:1.0.1")
+
+
+    androidTestImplementation ("androidx.room:room-testing:2.6.1")
+
     // Local Unit Tests
     testImplementation ("org.hamcrest:hamcrest-all:1.3")
     testImplementation ("androidx.arch.core:core-testing:2.1.0")
@@ -158,6 +162,7 @@ dependencies {
     androidTestImplementation ("org.mockito:mockito-core:2.21.0")
     androidTestImplementation( "com.linkedin.dexmaker:dexmaker-mockito:2.28.1")
 
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
 
 //    implementation(libs.firebase.crashlytics)
 //    implementation(libs.analytics)

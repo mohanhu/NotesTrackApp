@@ -1,6 +1,9 @@
 package com.example.notestrack.home.presentation.fragment
 
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +26,12 @@ import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
 import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiState
 import com.example.notestrack.home.presentation.viewmodel.HomeNotesViewModel
 import com.example.notestrack.profile.data.local.entity.UserDetailEntity
+import com.example.notestrack.utils.convertMsToDateFormat
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +39,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.time.Instant
+import java.time.ZoneId
+import java.util.Calendar
+import java.util.TimeZone
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -60,12 +73,70 @@ class HomeFragment : Fragment() {
 
         bindList(uiState.map { it.homeCategoryList },accept)
 
+        onClickListener(accept,uiState)
+
         bindUiDetails(uiState.map { it.userDetailEntity })
 
     }
 
-    private fun FragmentHomeBinding.bindUiDetails(user: Flow<UserDetailEntity>) {
+    private fun FragmentHomeBinding.onClickListener(accept: (HomeNoteUiAction) -> Unit, uiState: StateFlow<HomeNoteUiState>) {
 
+        calender.setOnClickListener {
+            val today = Calendar.getInstance().apply {
+                timeZone = TimeZone.getTimeZone(ZoneId.systemDefault())
+            }
+
+            val currentInMs = uiState.value.selectedPickedDate.takeIf { it>0 }?:Instant.now().toEpochMilli()
+
+            val calendarConstraints = CalendarConstraints.Builder()
+            calendarConstraints.setValidator(DateValidatorPointBackward.before(today.timeInMillis))
+//            calendarConstraints.setStart(today.timeInMillis)
+//            today.add(Calendar.YEAR,1)
+//            today.set(Calendar.MONTH,11)
+            calendarConstraints.setEnd(today.timeInMillis)
+
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Pick Date 📆")
+                .setSelection(currentInMs)
+                .setCalendarConstraints(calendarConstraints.build())
+                .build().also { picker->
+                    picker.show(childFragmentManager,"MaterialDatePicker")
+                }
+                .also {
+                    it.addOnPositiveButtonClickListener { item->
+                        etSearch.setText("")
+                        accept.invoke(HomeNoteUiAction.DatePickerFilter(item))
+                    }
+                }
+        }
+
+        tvDateOfSelection.setOnClickListener {
+            accept.invoke(HomeNoteUiAction.DatePickerFilter(0))
+        }
+
+        uiState.map { it.selectedPickedDate }.onEach {
+           tvDateOfSelection.isVisible = it!=0L
+            tvDateOfSelection.text = convertMsToDateFormat(it)
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        etSearch.addTextChangedListener(object :TextWatcher{
+            lateinit var countDownTimer: CountDownTimer
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+            override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                countDownTimer = object :CountDownTimer(100,200){
+                    override fun onTick(p0: Long) {
+                        accept.invoke(HomeNoteUiAction.OnTypeToSearch(s.toString()))
+                    }
+                    override fun onFinish() {
+                    }
+                }.start()
+            }
+        })
+    }
+
+    private fun FragmentHomeBinding.bindUiDetails(user: Flow<UserDetailEntity>) {
         user.onEach {
             tvUserName.text = getString(R.string.hey_s,it.userName)
             ivUserImage.text = it.userImage
