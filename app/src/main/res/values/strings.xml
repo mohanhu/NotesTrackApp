@@ -34,4 +34,12 @@
     <string name="save">Save</string>
     <string name="pin">Pin</string>
     <string name="pinned_notes">Pinned Notes</string>
+    <string name="notes_track">Notes Track</string>
+    <string name="v3_desc">Easily filter your notes by date to quickly find past entries. Stay organized and focused on the important moments by accessing your notes based on the time they were written.</string>
+    <string name="v2_desc">Quickly capture your thoughts and organize them with ease. Filter your notes by date to keep everything just a tap away. Simple, fast, and ready when you are.</string>
+    <string name="v2_title">Welcome to NotesTrack!</string>
+    <string name="v3_title">Filter by Date, Stay Focused</string>
+    <string name="v1_desc">Capture your thoughts and ideas with ease. Organize your notes and filter them by date to stay on top of everything. Simple, smart, and always ready to help you stay organized.</string>
+    <string name="next">Next</string>
+    <string name="search_your_background">Search your card image</string>
 </resources>

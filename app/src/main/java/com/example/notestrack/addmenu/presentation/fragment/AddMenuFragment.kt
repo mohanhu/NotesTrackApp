@@ -2,6 +2,9 @@ package com.example.notestrack.addmenu.presentation.fragment
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -110,6 +113,8 @@ class AddMenuFragment : Fragment() {
                         .setTextColor(Color.BLACK)
                         .setBackgroundTint(Color.WHITE).show()
                 }
+
+                else -> {}
             }
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -158,6 +163,12 @@ class AddMenuFragment : Fragment() {
             adapter.submitData(it)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.uiState.map { it.searchQuery }.distinctUntilChanged().onEach {
+            adapter.refresh()
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
     }
 
     private fun FragmentAddMenuBinding.onClickListener(accept: (AddCategoryUiAction) -> Unit) {
@@ -168,6 +179,22 @@ class AddMenuFragment : Fragment() {
         evTitle.doAfterTextChanged {
             accept.invoke(AddCategoryUiAction.TypingTitle(it.toString()))
         }
+
+        evCardName.addTextChangedListener(object :TextWatcher{
+            lateinit var countDownTimer: CountDownTimer
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+
+                countDownTimer = object :CountDownTimer(100,200){
+                    override fun onTick(p0: Long) {}
+                    override fun onFinish() {
+                        accept.invoke(AddCategoryUiAction.TypingBackGround(s.toString()))
+                    }
+                }.start()
+            }
+        })
 
         cardPickColor.setOnClickListener {
             ColorPickerDialog.Builder(requireContext())

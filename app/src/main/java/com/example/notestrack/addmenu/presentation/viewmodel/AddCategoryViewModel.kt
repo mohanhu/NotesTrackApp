@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.notestrack.addmenu.data.model.local.CategoryTableEntity
 import com.example.notestrack.addmenu.domain.repository.AddCategoryRepository
+import com.example.notestrack.core.domain.repository.DataStorePreference
 import com.example.notestrack.core.domain.repository.SessionPref
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AddCategoryViewModel @Inject constructor(
     private val addCategoryRepository: AddCategoryRepository,
-    private val sessionPref: SessionPref
+    private val sessionPref: SessionPref,
+    private val dataStorePreference: DataStorePreference
 ): ViewModel(){
 
     private val _uiState = MutableStateFlow(AddCategoryUiState())
@@ -79,7 +81,15 @@ class AddCategoryViewModel @Inject constructor(
                 }
 
                 is AddCategoryUiAction.EditNotesHomeMenuData -> editCategoryData(addCategoryUiAction.edit)
+                is AddCategoryUiAction.TypingBackGround -> updateCardName(addCategoryUiAction.backGround)
             }
+        }
+    }
+
+    private fun updateCardName(backGround: String) {
+        viewModelScope.launch(Dispatchers.IO){
+            _uiState.update { it.copy(searchQuery = backGround) }
+            dataStorePreference.setCardName(backGround)
         }
     }
 
@@ -152,6 +162,8 @@ sealed interface AddCategoryUiAction{
 
     data class TypingTitle(val title:String): AddCategoryUiAction
 
+    data class TypingBackGround(val backGround:String): AddCategoryUiAction
+
     data class ChooseColorCardStroke(val color:String): AddCategoryUiAction
 
     data class EditNotesHomeMenuData(val edit: NotesHomeMenuData): AddCategoryUiAction
@@ -167,5 +179,6 @@ data class AddCategoryUiState(
     val categoryTitle:String = "",
     val color:String = "#2CC2EC",
     val buttonEnable:Boolean = false,
-    val menuEditId:Long = 0
+    val menuEditId:Long = 0,
+    val searchQuery:String = ""
 )

@@ -104,6 +104,7 @@ class HomeFragment : Fragment() {
                 .also {
                     it.addOnPositiveButtonClickListener { item->
                         etSearch.setText("")
+                        accept.invoke(HomeNoteUiAction.OnTypeToSearch("IDLE"))
                         accept.invoke(HomeNoteUiAction.DatePickerFilter(item))
                     }
                 }
@@ -111,6 +112,7 @@ class HomeFragment : Fragment() {
 
         tvDateOfSelection.setOnClickListener {
             etSearch.setText("")
+            accept.invoke(HomeNoteUiAction.OnTypeToSearch("IDLE"))
             accept.invoke(HomeNoteUiAction.DatePickerFilter(0))
         }
 
@@ -149,6 +151,7 @@ class HomeFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         user.map { it.loadState }.distinctUntilChanged().onEach {
+            println("user.map { it.loadState } >>> filter >>$it")
             when(it){
                 LoadState.IDLE -> Unit
                 LoadState.EMPTY,

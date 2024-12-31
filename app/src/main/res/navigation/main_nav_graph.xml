@@ -32,4 +32,9 @@
         android:id="@+id/pinnedFragment"
         android:name="com.example.notestrack.notedetails.presentation.fragment.PinnedFragment"
         android:label="PinnedFragment" />
+    <fragment
+        android:id="@+id/splashMainFragment"
+        android:name="com.example.notestrack.splash.presentation.fragment.SplashMainFragment"
+        android:label="fragment_splash_main"
+        tools:layout="@layout/fragment_splash_main" />
 </navigation>

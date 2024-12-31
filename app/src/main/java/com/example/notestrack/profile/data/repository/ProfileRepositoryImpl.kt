@@ -16,7 +16,7 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun getUserDetails(userId: Long): Flow<UserDetailEntity> {
         return notesDataBase.userDetailDao.getUserDetailsFlow().map { entities ->
-            entities.first { it.userId == userId }
+            entities.firstOrNull { it.userId == userId }?:UserDetailEntity()
         }
     }
 

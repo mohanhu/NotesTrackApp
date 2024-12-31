@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -49,19 +50,9 @@ class MainViewModel
             _uiState.update { it.copy(isLightTheme = theme) }
         }.launchIn(viewModelScope)
 
-       viewModelScope.launch {
-           _uiState.update {
-               it.copy(userId = sessionPref.userId)
-           }
-           if (sessionPref.userId==0L){
-               Instant.now().toEpochMilli()?.also { s ->
-                   sessionPref.setUserId(s)
-                   _uiState.update {
-                       it.copy(userId = sessionPref.userId)
-                   }
-               }
-           }
-       }
+        dataStorePreference.userData.map { it.userId }.distinctUntilChanged().onEach { id->
+            _uiState.update { it.copy(userId = id) }
+        }.launchIn(viewModelScope)
     }
 
     private fun onUiAction(mainUiAction: MainUiAction) {

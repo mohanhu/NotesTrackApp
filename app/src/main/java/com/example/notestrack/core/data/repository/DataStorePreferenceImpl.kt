@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.notestrack.core.domain.repository.DataStorePreference
 import com.example.notestrack.core.domain.repository.UserData
 import kotlinx.coroutines.flow.Flow
@@ -17,10 +19,24 @@ class DataStorePreferenceImpl @Inject constructor(
 
     override val userData: Flow<UserData> = dataStorePreference.data.map {
         UserData(
-            isLightTheme = it[PreferencesKey.LightThemeKey]?:true
+            isLightTheme = it[PreferencesKey.LightThemeKey]?:true,
+            userId = it[PreferencesKey.UserId]?:0L,
+            cardBackGround = it[PreferencesKey.CardBackGround]?:""
         )
     }.catch {
 
+    }
+
+    override suspend fun setCardName(cardBackGround: String) {
+        dataStorePreference.edit {
+            it[PreferencesKey.CardBackGround] = cardBackGround
+        }
+    }
+
+    override suspend fun setUserName(userId: Long) {
+        dataStorePreference.edit {
+            it[PreferencesKey.UserId] = userId
+        }
     }
 
     override suspend fun setLightTheme(isLightTheme: Boolean) {
@@ -32,4 +48,6 @@ class DataStorePreferenceImpl @Inject constructor(
 
 object PreferencesKey{
      val LightThemeKey = booleanPreferencesKey("LightThemeKey")
+     val UserId = longPreferencesKey("UserId")
+     val CardBackGround = stringPreferencesKey("CardBackGround")
 }

@@ -7,6 +7,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
@@ -20,11 +21,14 @@ import com.example.notestrack.utils.ViewExtentions.makeGone
 import com.example.notestrack.utils.ViewExtentions.makeVisible
 import com.example.notestrack.utils.theme.ThemeSwitch
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private val navController: NavController by lazy { navHostFragment.navController }
 
-    private val navGraph: NavGraph by lazy { navController.navInflater.inflate(R.navigation.main_nav_graph) }
+    private lateinit var navGraph: NavGraph
 
     private val viewModel : MainViewModel by viewModels()
 
@@ -71,10 +75,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun ActivityMainBinding.bindState(uiState: StateFlow<MainUiState>) {
 
-        navControllerState()
-
         bindUiDetails(uiState)
 
+        navControllerState()
     }
 
     private fun ActivityMainBinding.bindUiDetails(uiState: StateFlow<MainUiState>) {
@@ -86,6 +89,25 @@ class MainActivity : AppCompatActivity() {
             }
         }.flowWithLifecycle(lifecycle,Lifecycle.State.STARTED)
             .launchIn(lifecycleScope)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                uiState.map { it.userId }.collectLatest {
+                    delay(100)
+                    if (it==0L){
+                        navGraph = navController.navInflater.inflate(R.navigation.main_nav_graph)
+                        navGraph.setStartDestination(R.id.splashMainFragment)
+                        navController.graph = navGraph
+                        mainNavGraph.setupWithNavController(navController)
+                    }else{
+                        navGraph = navController.navInflater.inflate(R.navigation.main_nav_graph)
+                        navGraph.setStartDestination(R.id.homeFragment)
+                        navController.graph = navGraph
+                        mainNavGraph.setupWithNavController(navController)
+                    }
+                }
+            }
+        }
     }
 
     private fun ActivityMainBinding.navControllerState() {
@@ -94,10 +116,6 @@ class MainActivity : AppCompatActivity() {
             mainNavGraph.loadGlideMenu(this@MainActivity,R.id.profileFragment)
             mainNavGraph.resizeMenuIcon()
         }
-
-        navController.graph = navGraph
-        mainNavGraph.setupWithNavController(navController)
-
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when(destination.id){
                 R.id.homeFragment->{

@@ -138,18 +138,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_over_view_card" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_image_choosen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/inset_small"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_choose_ur_card"
-                tools:listitem="@layout/image_choosen_lay_out" />
-
             <TextView
                 android:id="@+id/tv_choose_ur_card"
                 android:layout_width="0dp"
@@ -163,6 +151,48 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/overview_card" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ev_card_back_lay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/inset_small"
+                android:hint="@string/search_your_background"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/ev_selector_stroke"
+                app:counterEnabled="false"
+                app:counterMaxLength="80"
+                app:counterTextColor="@color/primary"
+                app:helperTextTextColor="@color/primary_dark"
+                app:hintTextColor="@color/primary_dark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_choose_ur_card"
+                app:placeholderTextColor="@color/primary_dark">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/ev_card_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:textAppearance="@style/TextAppearance.App.BodySmall" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_image_choosen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/inset_small"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ev_card_back_lay"
+                tools:listitem="@layout/image_choosen_lay_out" />
 
             <TextView
                 android:id="@+id/tv_card_back_picker"

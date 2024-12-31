@@ -17,7 +17,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -77,15 +79,16 @@ class HomeNotesViewModel
                             convertMsToDateFormat(it.createdAt).lowercase().contains(query.lowercase())
                 }.also { state->
                     _uiState.update { it.copy(homeCategoryList = state) }
-                    if (state.isNotEmpty()){
+                    if (state.isNotEmpty()) {
                         _uiState.update { it.copy(loadState = LoadState.NOT_LOAD) }
                     }
-                    else{
+                    else {
                         _uiState.update { it.copy(loadState = LoadState.EMPTY) }
                     }
                 }
             }
-        }.launchIn(viewModelScope)
+        }.flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
 
 
         val currentMs = Instant.now().atZone(ZoneId.systemDefault()).toLocalTime()
@@ -113,15 +116,17 @@ class HomeNotesViewModel
             homejob?.cancel(CancellationException("New One Come"))
         }
         homejob = mainRepository.getUserRelationWithNotesWhereEqualToDate(sessionPref.userId,dateInMs).onEach { relations ->
-            println("mainRepository.getUserRelationWithNotes >>>$relations")
+            println("user.map { it.loadState } >>> filter >>$relations")
             if (relations.isNotEmpty()){
                 _uiState.update { state->
-                    state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(), loadState = LoadState.NOT_LOAD)
+                    state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
+                        searchHelperList =  relations.first().categoryTableEntity.toNotesHomeMenuData(),
+                        loadState = if (relations.first().categoryTableEntity.isEmpty())LoadState.EMPTY else LoadState.NOT_LOAD)
                 }
             }
             else{
                 _uiState.update { state->
-                    state.copy(homeCategoryList = listOf(), loadState = LoadState.EMPTY)
+                    state.copy(homeCategoryList = listOf(), searchHelperList = listOf(), loadState = LoadState.EMPTY)
                 }
             }
         }.launchIn(viewModelScope)
@@ -136,30 +141,19 @@ class HomeNotesViewModel
 
             is HomeNoteUiAction.DeleteItem -> deleteItem(homeNoteUiAction.data)
             is HomeNoteUiAction.DatePickerFilter -> {
-                _uiState.update { it.copy(selectedPickedDate = homeNoteUiAction.date) }
+               viewModelScope.launch(Dispatchers.IO){ _uiState.update { it.copy(selectedPickedDate = homeNoteUiAction.date) }}
             }
 
             is HomeNoteUiAction.OnTypeToSearch -> {
-                _uiState.update { it.copy(searchQuery = homeNoteUiAction.search) }
+                viewModelScope.launch(Dispatchers.IO){_uiState.update { it.copy(searchQuery = homeNoteUiAction.search) }}
             }
         }
     }
 
     private fun fetchUserHeader() = viewModelScope.launch(Dispatchers.IO){
         mainRepository.selectUserDetails().onEach { entities ->
-            if (entities.isEmpty()){
-                mainRepository.insertUserDetails(
-                    UserDetailEntity(
-                        userId = _uiState.value.userId,
-                        userName = "Buddy",
-                        userImage = "🤗"
-                    )
-                )
-            }
-            else{
-                _uiState.update {
-                    it.copy(userDetailEntity = entities[0])
-                }
+            _uiState.update {
+                it.copy(userDetailEntity = entities[0])
             }
         }.launchIn(viewModelScope)
     }
@@ -176,18 +170,19 @@ class HomeNotesViewModel
 
         homejob = mainRepository.getUserRelationWithNotes(sessionPref.userId).onEach { relations ->
             println("mainRepository.getUserRelationWithNotes >>>$relations")
+            println("user.map { it.loadState } >>> main")
             if (relations.isNotEmpty()){
                 _uiState.update { state->
                     state.copy(
                         homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
                         searchHelperList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
-                        loadState = LoadState.NOT_LOAD
+                        loadState = if (relations.first().categoryTableEntity.isEmpty()) LoadState.EMPTY else LoadState.NOT_LOAD
                     )
                 }
             }
             else{
                 _uiState.update { state->
-                    state.copy(homeCategoryList = listOf(), loadState = LoadState.EMPTY)
+                    state.copy(homeCategoryList = listOf(), searchHelperList = listOf(), loadState = LoadState.EMPTY)
                 }
             }
         }.launchIn(viewModelScope)

@@ -7,9 +7,15 @@ interface DataStorePreference {
 
     val userData : Flow<UserData>
 
+    suspend fun setUserName(userId:Long)
+
+    suspend fun setCardName(cardBackGround: String)
+
     suspend fun setLightTheme(isLightTheme: Boolean)
 }
 
 data class UserData(
-    val isLightTheme:Boolean
+    val userId:Long,
+    val isLightTheme:Boolean,
+    val cardBackGround:String
 )
