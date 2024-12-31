@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,18 +61,51 @@ class HomeNotesViewModel
         }.launchIn(viewModelScope)
 
         uiState.map { it.searchQuery }.distinctUntilChanged().onEach { search->
-            search.ifEmpty { fetchDetailsWhereEqualByDate(
-                uiState.value.selectedPickedDate.takeIf { it>0L }?:Instant.now().toEpochMilli()
-            ) }
+            if (search=="IDLE"){
+                return@onEach
+            }
+            else{
+                search.ifEmpty { fetchDetailsWhereEqualByDate(
+                    uiState.value.selectedPickedDate.takeIf { it>0L }?:Instant.now().toEpochMilli()
+                ) }
+            }
+            _uiState.update { it.copy(loadState = LoadState.LOAD) }
+            delay(200)
             search.also { query->
-                _uiState.value.homeCategoryList.filter {
+                _uiState.value.searchHelperList.filter {
                     it.menuTitle.lowercase().contains(query.lowercase())||
                             convertMsToDateFormat(it.createdAt).lowercase().contains(query.lowercase())
                 }.also { state->
                     _uiState.update { it.copy(homeCategoryList = state) }
+                    if (state.isNotEmpty()){
+                        _uiState.update { it.copy(loadState = LoadState.NOT_LOAD) }
+                    }
+                    else{
+                        _uiState.update { it.copy(loadState = LoadState.EMPTY) }
+                    }
                 }
             }
         }.launchIn(viewModelScope)
+
+
+        val currentMs = Instant.now().atZone(ZoneId.systemDefault()).toLocalTime()
+
+        when(currentMs.hour){
+            in 5..11-> {
+                "Good Morning"
+            }
+            in 12..16->{
+                "Good AfterNoon"
+            }
+            in 17..20->{
+                "Good Evening"
+            }
+            else->{
+                "Good Night"
+            }
+        }.also { goodStatus->
+            _uiState.update { it.copy(statusOfToolHead = goodStatus) }
+        }
     }
 
     private fun fetchDetailsWhereEqualByDate(dateInMs: Long) =viewModelScope.launch(Dispatchers.IO){
@@ -81,12 +116,12 @@ class HomeNotesViewModel
             println("mainRepository.getUserRelationWithNotes >>>$relations")
             if (relations.isNotEmpty()){
                 _uiState.update { state->
-                    state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData())
+                    state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(), loadState = LoadState.NOT_LOAD)
                 }
             }
             else{
                 _uiState.update { state->
-                    state.copy(homeCategoryList = listOf())
+                    state.copy(homeCategoryList = listOf(), loadState = LoadState.EMPTY)
                 }
             }
         }.launchIn(viewModelScope)
@@ -143,12 +178,16 @@ class HomeNotesViewModel
             println("mainRepository.getUserRelationWithNotes >>>$relations")
             if (relations.isNotEmpty()){
                 _uiState.update { state->
-                    state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData())
+                    state.copy(
+                        homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
+                        searchHelperList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
+                        loadState = LoadState.NOT_LOAD
+                    )
                 }
             }
             else{
                 _uiState.update { state->
-                    state.copy(homeCategoryList = listOf())
+                    state.copy(homeCategoryList = listOf(), loadState = LoadState.EMPTY)
                 }
             }
         }.launchIn(viewModelScope)
@@ -157,11 +196,22 @@ class HomeNotesViewModel
 
 data class HomeNoteUiState(
     val homeCategoryList : List<NotesHomeMenuData> = listOf(),
+    val searchHelperList : List<NotesHomeMenuData> = listOf(),
     val userId: Long = 0,
     val userDetailEntity: UserDetailEntity=UserDetailEntity(),
     val selectedPickedDate:Long = 0L,
-    val searchQuery:String = ""
+    val searchQuery:String = "IDLE",
+    val statusOfToolHead: String = "",
+    val loadState: LoadState = LoadState.IDLE
 )
+
+enum class LoadState{
+    IDLE,
+    LOAD,
+    NOT_LOAD,
+    EMPTY
+}
+
 
 sealed interface HomeNoteUiAction {
     data object FetchUserDetails : HomeNoteUiAction

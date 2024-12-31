@@ -25,13 +25,11 @@ import com.example.notestrack.home.presentation.adapter.NotesHomeAdapter
 import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
 import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiState
 import com.example.notestrack.home.presentation.viewmodel.HomeNotesViewModel
-import com.example.notestrack.profile.data.local.entity.UserDetailEntity
+import com.example.notestrack.home.presentation.viewmodel.LoadState
 import com.example.notestrack.utils.convertMsToDateFormat
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
-import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.timepicker.MaterialTimePicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,7 +73,7 @@ class HomeFragment : Fragment() {
 
         onClickListener(accept,uiState)
 
-        bindUiDetails(uiState.map { it.userDetailEntity })
+        bindUiDetails(uiState)
 
     }
 
@@ -96,6 +94,7 @@ class HomeFragment : Fragment() {
             calendarConstraints.setEnd(today.timeInMillis)
 
             MaterialDatePicker.Builder.datePicker()
+                .setTheme(R.style.ThemeOverlay_App_DatePicker)
                 .setTitleText("Pick Date 📆")
                 .setSelection(currentInMs)
                 .setCalendarConstraints(calendarConstraints.build())
@@ -111,6 +110,7 @@ class HomeFragment : Fragment() {
         }
 
         tvDateOfSelection.setOnClickListener {
+            etSearch.setText("")
             accept.invoke(HomeNoteUiAction.DatePickerFilter(0))
         }
 
@@ -136,10 +136,31 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun FragmentHomeBinding.bindUiDetails(user: Flow<UserDetailEntity>) {
-        user.onEach {
+    private fun FragmentHomeBinding.bindUiDetails(user: StateFlow<HomeNoteUiState>) {
+        user.map { it.userDetailEntity }.onEach {
             tvUserName.text = getString(R.string.hey_s,it.userName)
             ivUserImage.text = it.userImage
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        user.map { it.statusOfToolHead }.distinctUntilChanged().onEach {
+            tvStatusOfNow.text = it
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        user.map { it.loadState }.distinctUntilChanged().onEach {
+            when(it){
+                LoadState.IDLE -> Unit
+                LoadState.EMPTY,
+                LoadState.LOAD -> {
+                    rvNotesTitle.isVisible = false
+                    placeLottie.root.isVisible = true
+                }
+                LoadState.NOT_LOAD -> {
+                    rvNotesTitle.isVisible = true
+                    placeLottie.root.isVisible = false
+                }
+            }
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -177,8 +198,6 @@ class HomeFragment : Fragment() {
 
         listFlow.distinctUntilChanged().onEach { data->
             adapter.submitList(data)
-            rvNotesTitle.isVisible = data.isNotEmpty()
-            placeLottie.root.isVisible = data.isEmpty()
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
