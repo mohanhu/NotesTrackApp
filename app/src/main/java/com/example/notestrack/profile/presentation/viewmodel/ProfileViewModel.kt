@@ -85,6 +85,7 @@ class ProfileViewModel @Inject constructor(
         val userName = _uiState.value.editUserName
         val userImage = _uiState.value.editUserImage.takeIf { it.isNotEmpty() }?:"😃"
         profileRepository.updateUserDetails(userId,userName,userImage)
+        _uiState.update { it.copy(isValidInput = false) }
     }
 
     private fun fetchUserDetails() = viewModelScope.launch(Dispatchers.IO){
