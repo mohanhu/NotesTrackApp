@@ -64,7 +64,7 @@ class AddMenuFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) { super.onViewCreated(view, savedInstanceState)
 
-        binding.run {
+        binding.apply {
             bindState(
                 viewModel.imageListPaging,
                 viewModel.accept,

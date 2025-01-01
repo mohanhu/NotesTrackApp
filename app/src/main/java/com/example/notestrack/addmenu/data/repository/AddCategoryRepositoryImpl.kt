@@ -42,7 +42,7 @@ class AddCategoryRepositoryImpl @Inject constructor(
     override fun getSearchCard(): Flow<PagingData<Photo>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 20,
+                pageSize = 10,
                 prefetchDistance = 5
             ),
             pagingSourceFactory = {

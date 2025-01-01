@@ -32,7 +32,6 @@ class CategoryPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
         return try {
-
             val page = params.key?:1
             var list = listOf<Photo>()
 
@@ -44,7 +43,7 @@ class CategoryPagingSource(
                 }
             }
             LoadResult.Page(
-                data =  list,
+                data =  list.toList(),
                 nextKey = if (list.isEmpty()) null else page+1,
                 prevKey = if (page==1) null else page-1
             )

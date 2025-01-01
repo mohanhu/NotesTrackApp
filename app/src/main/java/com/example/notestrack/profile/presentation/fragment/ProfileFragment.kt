@@ -76,7 +76,6 @@ class ProfileFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         uiState.map { it.isLightTheme }.onEach {
-//            selectIcon.isSelected = it
             tvStatusOfTheme.text =  it
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -102,11 +101,8 @@ class ProfileFragment : Fragment() {
         darkThemeContainer.setOnClickListener {
 
             val popupMenu = PopupMenu(requireContext(),tvStatusOfTheme,Gravity.BOTTOM)
-            listOf(
-                "Default",
-                "Light",
-                "Dark"
-            ).forEachIndexed { index, i ->
+            listOf("Default", "Light", "Dark")
+                .forEachIndexed { index, i ->
                 popupMenu.menu.add(index,index,index,i)
             }
             popupMenu.setOnMenuItemClickListener { menu->
@@ -127,8 +123,6 @@ class ProfileFragment : Fragment() {
                 true
             }
             popupMenu.show()
-//            selectIcon.isSelected = !selectIcon.isSelected
-//            viewModel.setTheme(selectIcon.isSelected)
         }
         evUser.doAfterTextChanged {
             accept.invoke(ProfileUiAction.TypingStateOfName(it.toString()))

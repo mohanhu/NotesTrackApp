@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
@@ -44,8 +45,6 @@ class AddCategoryViewModel @Inject constructor(
 
     val accept: (AddCategoryUiAction)->Unit
 
-    val imageListPaging = addCategoryRepository.getSearchCard().cachedIn(viewModelScope)
-
     private val userId = sessionPref.userId
 
     init {
@@ -56,6 +55,10 @@ class AddCategoryViewModel @Inject constructor(
 
         accept = ::onUIAction
     }
+
+    val imageListPaging = addCategoryRepository.getSearchCard().catch {
+
+    }.cachedIn(viewModelScope)
 
     private fun onUIAction(addCategoryUiAction: AddCategoryUiAction) {
         viewModelScope.launch {
