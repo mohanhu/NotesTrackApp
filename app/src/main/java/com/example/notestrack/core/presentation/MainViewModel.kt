@@ -71,5 +71,5 @@ data class MainUiState(
     val splashScreenState:Boolean = false,
     val userId: Long = 0,
     val userDetailEntity: UserDetailEntity=UserDetailEntity(),
-    val isLightTheme:Boolean = true
+    val isLightTheme:String = ""
 )

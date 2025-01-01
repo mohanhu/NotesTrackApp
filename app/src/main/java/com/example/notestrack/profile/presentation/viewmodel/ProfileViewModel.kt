@@ -93,7 +93,7 @@ class ProfileViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun setTheme(isLight: Boolean) = viewModelScope.launch {
+    fun setTheme(isLight: String) = viewModelScope.launch {
         dataStorePreference.setLightTheme(isLight)
         _uiState.update { it.copy(isLightTheme = isLight) }
     }
@@ -110,5 +110,11 @@ data class ProfileUiState(
     val editUserName:String = "",
     val editUserImage:String = "",
     val isValidInput:Boolean = false,
-    val isLightTheme:Boolean = true
+    val isLightTheme:String = PhoneDarkState.Default.name
 )
+
+enum class PhoneDarkState{
+    Default,
+    Light,
+    Dark
+}

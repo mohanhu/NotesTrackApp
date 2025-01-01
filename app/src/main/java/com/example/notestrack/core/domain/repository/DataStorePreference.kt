@@ -11,11 +11,11 @@ interface DataStorePreference {
 
     suspend fun setCardName(cardBackGround: String)
 
-    suspend fun setLightTheme(isLightTheme: Boolean)
+    suspend fun setLightTheme(isLightTheme: String)
 }
 
 data class UserData(
     val userId:Long,
-    val isLightTheme:Boolean,
+    val isLightTheme:String,
     val cardBackGround:String
 )

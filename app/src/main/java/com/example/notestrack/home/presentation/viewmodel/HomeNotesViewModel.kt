@@ -9,6 +9,7 @@ import com.example.notestrack.core.domain.repository.SessionPref
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import com.example.notestrack.profile.data.local.entity.UserDetailEntity
 import com.example.notestrack.utils.convertMsToDateFormat
+import com.example.notestrack.utils.safeCall
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
@@ -152,8 +153,10 @@ class HomeNotesViewModel
 
     private fun fetchUserHeader() = viewModelScope.launch(Dispatchers.IO){
         mainRepository.selectUserDetails().onEach { entities ->
-            _uiState.update {
-                it.copy(userDetailEntity = entities[0])
+            safeCall {
+                _uiState.update {
+                    it.copy(userDetailEntity = entities[0])
+                }
             }
         }.launchIn(viewModelScope)
     }

@@ -1,6 +1,7 @@
 package com.example.notestrack.core.presentation
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -14,6 +15,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.notestrack.R
 import com.example.notestrack.databinding.ActivityMainBinding
+import com.example.notestrack.profile.presentation.viewmodel.PhoneDarkState
 import com.example.notestrack.richlib.LoadBottomGlide
 import com.example.notestrack.richlib.LoadBottomGlide.loadGlideMenu
 import com.example.notestrack.richlib.LoadBottomGlide.resizeMenuIcon
@@ -81,19 +83,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun ActivityMainBinding.bindUiDetails(uiState: StateFlow<MainUiState>) {
-        uiState.map { it.isLightTheme }.onEach {
-            if (it){
-                ThemeSwitch.switchToLightTheme()
-            }else{
-                ThemeSwitch.switchToDarkTheme()
-            }
-        }.flowWithLifecycle(lifecycle,Lifecycle.State.STARTED)
-            .launchIn(lifecycleScope)
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 uiState.map { it.userId }.collectLatest {
-                    delay(100)
+                    delay(200)
                     if (it==0L){
                         navGraph = navController.navInflater.inflate(R.navigation.main_nav_graph)
                         navGraph.setStartDestination(R.id.splashMainFragment)
@@ -108,6 +101,21 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        uiState.map { it.isLightTheme }.distinctUntilChanged().onEach {
+            when(it){
+                PhoneDarkState.Default.name->{
+                    ThemeSwitch.switchToSystemDefaultTheme()
+                }
+                PhoneDarkState.Light.name->{
+                    ThemeSwitch.switchToLightTheme()
+                }
+                PhoneDarkState.Dark.name->{
+                    ThemeSwitch.switchToDarkTheme()
+                }
+            }
+        }.flowWithLifecycle(lifecycle,Lifecycle.State.STARTED)
+            .launchIn(lifecycleScope)
     }
 
     private fun ActivityMainBinding.navControllerState() {

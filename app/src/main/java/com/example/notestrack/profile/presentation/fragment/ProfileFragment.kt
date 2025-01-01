@@ -1,9 +1,11 @@
 package com.example.notestrack.profile.presentation.fragment
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -15,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.notestrack.R
 import com.example.notestrack.databinding.FragmentProfileBinding
 import com.example.notestrack.profile.presentation.dialog.EmojiPickerDialog
+import com.example.notestrack.profile.presentation.viewmodel.PhoneDarkState
 import com.example.notestrack.profile.presentation.viewmodel.ProfileUiAction
 import com.example.notestrack.profile.presentation.viewmodel.ProfileUiState
 import com.example.notestrack.profile.presentation.viewmodel.ProfileViewModel
@@ -73,7 +76,8 @@ class ProfileFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         uiState.map { it.isLightTheme }.onEach {
-            selectIcon.isSelected = it
+//            selectIcon.isSelected = it
+            tvStatusOfTheme.text =  it
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -96,8 +100,35 @@ class ProfileFragment : Fragment() {
         }
 
         darkThemeContainer.setOnClickListener {
-            selectIcon.isSelected = !selectIcon.isSelected
-            viewModel.setTheme(selectIcon.isSelected)
+
+            val popupMenu = PopupMenu(requireContext(),tvStatusOfTheme,Gravity.BOTTOM)
+            listOf(
+                "Default",
+                "Light",
+                "Dark"
+            ).forEachIndexed { index, i ->
+                popupMenu.menu.add(index,index,index,i)
+            }
+            popupMenu.setOnMenuItemClickListener { menu->
+                tvStatusOfTheme.text = when(menu.itemId){
+                    0->{
+                        viewModel.setTheme(PhoneDarkState.Default.name)
+                        menu.title
+                    }
+                    1->{
+                        viewModel.setTheme(PhoneDarkState.Light.name)
+                        menu.title
+                    }
+                    else->{
+                        viewModel.setTheme(PhoneDarkState.Dark.name)
+                        menu.title
+                    }
+                }
+                true
+            }
+            popupMenu.show()
+//            selectIcon.isSelected = !selectIcon.isSelected
+//            viewModel.setTheme(selectIcon.isSelected)
         }
         evUser.doAfterTextChanged {
             accept.invoke(ProfileUiAction.TypingStateOfName(it.toString()))
