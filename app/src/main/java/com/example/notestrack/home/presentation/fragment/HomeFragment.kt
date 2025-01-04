@@ -163,6 +163,8 @@ class HomeFragment : Fragment() {
                     rvNotesTitle.isVisible = true
                     placeLottie.root.isVisible = false
                 }
+
+                else -> {}
             }
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)

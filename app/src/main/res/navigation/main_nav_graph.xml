@@ -37,4 +37,14 @@
         android:name="com.example.notestrack.splash.presentation.fragment.SplashMainFragment"
         android:label="fragment_splash_main"
         tools:layout="@layout/fragment_splash_main" />
+    <fragment
+        android:id="@+id/taskSampleFragment"
+        android:name="com.example.notestrack.task.presentation.fragment.TaskSampleFragment"
+        android:label="fragment_task_sample"
+        tools:layout="@layout/fragment_task_sample" />
+    <fragment
+        android:id="@+id/sampleBackFragment"
+        android:name="com.example.notestrack.task.presentation.fragment.SampleBackFragment"
+        android:label="fragment_sample_back"
+        tools:layout="@layout/fragment_sample_back" />
 </navigation>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:minHeight="80dp">
+    <TextView
+        android:id="@+id/tv_error_msg"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?android:textColorPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        tools:text="Timeout"
+        tools:visibility="visible"/>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminateBehavior="cycle"
+        android:indeterminate="true"
+        android:progressTint="@color/red"
+        android:backgroundTint="@color/red"
+        android:indeterminateTint="@color/red"
+        android:indeterminateTintMode="src_in"
+        android:progressBackgroundTint="@color/red"
+        tools:progress="70"
+        tools:indeterminate="false"
+        tools:visibility="visible"/>
+
+</LinearLayout>

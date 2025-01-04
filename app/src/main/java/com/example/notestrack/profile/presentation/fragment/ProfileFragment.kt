@@ -71,6 +71,7 @@ class ProfileFragment : Fragment() {
             tvUserName.text = it.userName
             ivUserImage.text = it.userImage
             evUser.setText(it.userName)
+            evUser.setSelection(it.userName.length)
             ivEditUserImage.text = it.userImage
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -80,7 +81,7 @@ class ProfileFragment : Fragment() {
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        uiState.map { it.isValidInput }.distinctUntilChanged().onEach {
+        uiState.map { it.isValidInput }.onEach {
             btnConfirmOuter.isVisible = it && editProfile.isVisible
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)

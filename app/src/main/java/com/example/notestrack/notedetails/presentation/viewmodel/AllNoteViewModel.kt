@@ -8,6 +8,7 @@ import com.example.notestrack.addnote.data.local.entity.NotesTableEntity
 import com.example.notestrack.addnote.domain.repository.NotesRepository
 import com.example.notestrack.home.domain.model.NotesHomeMenuData
 import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
+import com.example.notestrack.home.presentation.viewmodel.LoadState
 import com.example.notestrack.notedetails.data.model.NotesData
 import com.example.notestrack.notedetails.domain.repository.AllNoteRepository
 import com.example.notestrack.utils.convertMsToDateFormat
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,9 +59,18 @@ class AllNoteViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         uiState.map { it.searchQuery }.distinctUntilChanged().onEach { search->
-            search.ifEmpty { fetchDetailsWhereEqualByDate(
-                uiState.value.selectedPickedDate.takeIf { it>0L }?: Instant.now().toEpochMilli()
-            ) }
+            if (search == "IDLE") return@onEach
+
+            search.ifEmpty {
+                if (uiState.value.selectedPickedDate>0){
+                    fetchDetailsWhereEqualByDate(uiState.value.selectedPickedDate)
+                }
+                else{
+                    fetchNotes()
+                }
+             }
+            _uiState.update { it.copy(loadState = LoadState.LOAD) }
+            delay(200)
             search.also { query->
                 _uiState.value.notesData.filter {
                     it.notesDesc.lowercase().contains(query.lowercase())||
@@ -67,6 +78,12 @@ class AllNoteViewModel @Inject constructor(
                     convertMsToDateFormat(it.date).lowercase().contains(query.lowercase())
                 }.also { state->
                     _uiState.update { it.copy(notesData = state) }
+                    if (state.isNotEmpty()) {
+                        _uiState.update { it.copy(loadState = LoadState.NOT_LOAD) }
+                    }
+                    else {
+                        _uiState.update { it.copy(loadState = LoadState.EMPTY) }
+                    }
                 }
             }
         }.launchIn(viewModelScope)
@@ -131,7 +148,10 @@ class AllNoteViewModel @Inject constructor(
         }
         homejob = allNoteRepository.fetchNotesByMenuId(menuId).onEach { ent->
             _uiState.update {
-                it.copy(notesData = ent)
+                it.copy(
+                    notesData = ent,
+                    loadState = if (ent.isEmpty()) LoadState.EMPTY else LoadState.NOT_LOAD
+                )
             }
         }.launchIn(viewModelScope)
     }
@@ -144,7 +164,10 @@ class AllNoteViewModel @Inject constructor(
         homejob = allNoteRepository.fetchNotesWhereEqualToDate(dateInMs = dateInMs, menuId = menuId).onEach { relations ->
             println("mainRepository.getUserRelationWithNotes >>>$relations")
             _uiState.update { state->
-                state.copy(notesData = relations)
+                state.copy(
+                    notesData = relations,
+                    loadState = if (relations.isEmpty()) LoadState.EMPTY else LoadState.NOT_LOAD
+                    )
             }
         }.launchIn(viewModelScope)
     }
@@ -155,7 +178,8 @@ data class AllNoteUiState(
     val currentNoteMenuId:Long = 0,
     val notesHomeMenuData: NotesHomeMenuData=NotesHomeMenuData(),
     val selectedPickedDate:Long = 0L,
-    val searchQuery:String = ""
+    val searchQuery:String = "IDLE",
+    val loadState: LoadState = LoadState.IDLE
 )
 
 sealed interface AllNoteUiAction{

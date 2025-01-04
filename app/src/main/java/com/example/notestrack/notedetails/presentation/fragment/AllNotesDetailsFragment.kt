@@ -20,7 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notestrack.R
 import com.example.notestrack.databinding.FragmentAllNotesDetailsBinding
-import com.example.notestrack.home.presentation.viewmodel.HomeNoteUiAction
+import com.example.notestrack.home.presentation.viewmodel.LoadState
 import com.example.notestrack.notedetails.presentation.adapter.NotesDataAdapter
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteUiAction
 import com.example.notestrack.notedetails.presentation.viewmodel.AllNoteUiState
@@ -101,6 +101,7 @@ class AllNotesDetailsFragment : Fragment() {
             calendarConstraints.setEnd(today.timeInMillis)
 
             MaterialDatePicker.Builder.datePicker()
+                .setTheme(R.style.ThemeOverlay_App_DatePicker)
                 .setTitleText("Pick Date 📆")
                 .setSelection(currentInMs)
                 .setCalendarConstraints(calendarConstraints.build())
@@ -110,12 +111,15 @@ class AllNotesDetailsFragment : Fragment() {
                 .also {
                     it.addOnPositiveButtonClickListener { item->
                         etSearch.setText("")
+                        accept.invoke(AllNoteUiAction.OnTypeToSearch("IDLE"))
                         accept.invoke(AllNoteUiAction.DatePickerFilter(item))
                     }
                 }
         }
 
         tvDateOfSelection.setOnClickListener {
+            etSearch.setText("")
+            accept.invoke(AllNoteUiAction.OnTypeToSearch("IDLE"))
             accept.invoke(AllNoteUiAction.DatePickerFilter(0))
         }
 
@@ -200,9 +204,27 @@ class AllNotesDetailsFragment : Fragment() {
         rvImageChoosen.adapter = adapter
         uiState.map { it.notesData }.distinctUntilChanged().onEach {
             adapter.submitList(it)
-            rvImageChoosen.isVisible = it.isNotEmpty()
-            progress.isVisible = it.isEmpty()
-            placeLottie.root.isVisible = it.isEmpty()
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        uiState.map { it.loadState }.distinctUntilChanged().onEach {
+            println("user.map { it.loadState } >>> filter >>$it")
+            when(it){
+                LoadState.IDLE -> Unit
+                LoadState.EMPTY,
+                LoadState.LOAD -> {
+                    progress.isVisible = true
+                    rvImageChoosen.isVisible = false
+                    placeLottie.root.isVisible = true
+                }
+                LoadState.NOT_LOAD -> {
+                    progress.isVisible = false
+                    rvImageChoosen.isVisible = true
+                    placeLottie.root.isVisible = false
+                }
+
+                else -> {}
+            }
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle,Lifecycle.State.STARTED)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 

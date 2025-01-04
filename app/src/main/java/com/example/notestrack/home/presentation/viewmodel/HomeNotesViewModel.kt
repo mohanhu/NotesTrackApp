@@ -64,18 +64,20 @@ class HomeNotesViewModel
         }.launchIn(viewModelScope)
 
         uiState.map { it.searchQuery }.distinctUntilChanged().onEach { search->
-            if (search=="IDLE"){
-                return@onEach
-            }
-            else{
-                search.ifEmpty { fetchDetailsWhereEqualByDate(
-                    uiState.value.selectedPickedDate.takeIf { it>0L }?:Instant.now().toEpochMilli()
-                ) }
+            if (search=="IDLE"){ return@onEach }
+
+            search.ifEmpty {
+                if (uiState.value.selectedPickedDate>0){
+                    fetchDetailsWhereEqualByDate(uiState.value.selectedPickedDate)
+                }
+                else{
+                    fetchHomeList()
+                }
             }
             _uiState.update { it.copy(loadState = LoadState.LOAD) }
             delay(200)
             search.also { query->
-                _uiState.value.searchHelperList.filter {
+                _uiState.value.homeCategoryList.filter {
                     it.menuTitle.lowercase().contains(query.lowercase())||
                             convertMsToDateFormat(it.createdAt).lowercase().contains(query.lowercase())
                 }.also { state->
@@ -121,13 +123,12 @@ class HomeNotesViewModel
             if (relations.isNotEmpty()){
                 _uiState.update { state->
                     state.copy(homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
-                        searchHelperList =  relations.first().categoryTableEntity.toNotesHomeMenuData(),
                         loadState = if (relations.first().categoryTableEntity.isEmpty())LoadState.EMPTY else LoadState.NOT_LOAD)
                 }
             }
             else{
                 _uiState.update { state->
-                    state.copy(homeCategoryList = listOf(), searchHelperList = listOf(), loadState = LoadState.EMPTY)
+                    state.copy(homeCategoryList = listOf(),loadState = LoadState.EMPTY)
                 }
             }
         }.launchIn(viewModelScope)
@@ -178,14 +179,13 @@ class HomeNotesViewModel
                 _uiState.update { state->
                     state.copy(
                         homeCategoryList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
-                        searchHelperList = relations.first().categoryTableEntity.toNotesHomeMenuData(),
                         loadState = if (relations.first().categoryTableEntity.isEmpty()) LoadState.EMPTY else LoadState.NOT_LOAD
                     )
                 }
             }
             else{
                 _uiState.update { state->
-                    state.copy(homeCategoryList = listOf(), searchHelperList = listOf(), loadState = LoadState.EMPTY)
+                    state.copy(homeCategoryList = listOf(),loadState = LoadState.EMPTY)
                 }
             }
         }.launchIn(viewModelScope)
@@ -194,7 +194,6 @@ class HomeNotesViewModel
 
 data class HomeNoteUiState(
     val homeCategoryList : List<NotesHomeMenuData> = listOf(),
-    val searchHelperList : List<NotesHomeMenuData> = listOf(),
     val userId: Long = 0,
     val userDetailEntity: UserDetailEntity=UserDetailEntity(),
     val selectedPickedDate:Long = 0L,
@@ -207,7 +206,8 @@ enum class LoadState{
     IDLE,
     LOAD,
     NOT_LOAD,
-    EMPTY
+    EMPTY,
+    END_PAGE
 }
 
 
