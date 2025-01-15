@@ -118,17 +118,17 @@ class TaskSampleFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
-                getNavigationResultFlow<Int>(FRAGMENT_RESULT)?.collectLatest { result->
-                    println("findNavController().currentBackStackEntry?.savedStateHandle $result")
-
-                    if (result== RESULT_OK && fragmentResultKey=="Sample"){
-                        Toast.makeText(requireContext(), "Done", Toast.LENGTH_SHORT).show()
-                    }
-
-                    if (result!=null){
-                        clearNavigationResult<Int>(FRAGMENT_RESULT)
-                    }
-                }
+//                getNavigationResultFlow<Int>(FRAGMENT_RESULT)?.collectLatest { result->
+//                    println("findNavController().currentBackStackEntry?.savedStateHandle $result")
+//
+//                    if (result== RESULT_OK && fragmentResultKey=="Sample"){
+//                        Toast.makeText(requireContext(), "Done", Toast.LENGTH_SHORT).show()
+//                    }
+//
+//                    if (result!=null){
+//                        clearNavigationResult<Int>(FRAGMENT_RESULT)
+//                    }
+//                }
                 fragmentResultKey = null
             }
         }

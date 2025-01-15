@@ -37,15 +37,15 @@ class SampleBackFragment : Fragment() {
 
         println("findNavController().currentBackStackEntry?.savedStateHandle sample >$from")
 
-        savedStateHandle = when(from){
-            "popup"-> findNavController().previousBackStackEntry?.savedStateHandle
-            else->null
-        }
-        savedStateHandle?.set(FRAGMENT_RESULT, RESULT_CANCELED)
+//        savedStateHandle = when(from){
+//            "popup"-> findNavController().previousBackStackEntry?.savedStateHandle
+//            else->null
+//        }
+//        savedStateHandle?.set(FRAGMENT_RESULT, RESULT_CANCELED)
 
         binding.root.setOnClickListener{
             when(from){
-                "popup"-> savedStateHandle?.set(FRAGMENT_RESULT, RESULT_OK)
+//                "popup"-> savedStateHandle?.set(FRAGMENT_RESULT, RESULT_OK)
             }
             findNavController().popBackStack()
         }

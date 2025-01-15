@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                     delay(200)
                     if (it==0L){
                         navGraph = navController.navInflater.inflate(R.navigation.main_nav_graph)
-                        navGraph.setStartDestination(R.id.taskSampleFragment)
+                        navGraph.setStartDestination(R.id.splashMainFragment)
                         navController.graph = navGraph
                         mainNavGraph.setupWithNavController(navController)
                     }else{
