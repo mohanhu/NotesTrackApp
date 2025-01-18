@@ -4,7 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.notestrack.addmenu.MainCoroutineRule
 import com.example.notestrack.addmenu.data.model.local.CategoryTableEntity
 import com.example.notestrack.addmenu.data.repository.FakeCategoryRepositoryTest
+import com.example.notestrack.core.data.repository.FakeDataStorePreferenceTest
 import com.example.notestrack.core.data.repository.FakeSessionPrefImplTest
+import com.example.notestrack.core.domain.repository.DataStorePreference
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -25,7 +27,8 @@ class AddCategoryViewModelTest{
     @Before
     fun setUp(){
         addCategoryViewModel = AddCategoryViewModel(
-            FakeCategoryRepositoryTest(), FakeSessionPrefImplTest()
+            FakeCategoryRepositoryTest(), FakeSessionPrefImplTest(),
+            FakeDataStorePreferenceTest()
         )
     }
 
